@@ -1,0 +1,13 @@
+source 'http://rubygems.org'
+
+gem 'sinatra'
+gem 'redis'
+gem 'mongo'
+gem 'bson_ext'
+gem 'thin'
+gem 'haml'
+gem 'websocket-native'
+gem 'pusher'
+gem 'pusher-client'
+gem 'firebase'
+gem 'pubnub'

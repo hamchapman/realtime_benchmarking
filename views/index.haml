@@ -1,0 +1,30 @@
+!!!
+%html
+  %head
+    %title Competitor Analysis
+    %link{:rel => :stylesheet, :type => :"text/css", :href => "/stylesheets/nv.d3.css"}
+  %body
+    %h3 Competitor Analysis
+    %script{src: "http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"}
+    %script{src: "http://cdn.pubnub.com/pubnub.min.js"}
+    %script{src: "https://cdn.firebase.com/v0/firebase.js"}
+    %script{src: "http://dfdbz2tdq3k01.cloudfront.net/js/2.1.0/ortc.js"}
+    %script{src: "https://cdn.goinstant.net/v1/platform.min.js"}
+    %script{src: "http://js.pusher.com/2.1/pusher.min.js"}
+    %script{src: "../js/d3.js"}
+    %script{src: "../js/nv.d3.js"}
+    %script{src: "../js/BenchmarkService.js"}
+    %script{src: "../js/FirebaseService.js"}
+    %script{src: "../js/PubnubService.js"}
+    %script{src: "../js/GoInstantService.js"}
+    %script{src: "../js/RealtimeCoService.js"}
+    %script{src: "../js/PusherService.js"}
+    %script{src: "../js/Graph.js"}
+
+    :css
+      #chart svg {
+        height: 500px;
+      }
+    #chart
+      %svg
+

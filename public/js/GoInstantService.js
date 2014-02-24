@@ -1,40 +1,3 @@
-// (function() {
-
-//   var url = 'https://goinstant.net/cd2b44835134/analysis';
-//   var connection = new goinstant.Connection(url);
-
-  // connection.connect(function (err) {
-  //   if (err) {
-  //     console.log(err);
-  //     return;
-  //   }
-
-  //   var benchmark = connection.room('benchmark');
-
-  //   benchmark.join(function(err) {
-  //     if (err) {
-  //       console.log(err);
-  //       return;
-  //     }
-
-  //     channel = benchmark.channel('channel');
-
-  //     channel.on('message', {local: true}, function(msg) {
-  //       console.log("GI message received");
-  //     });
-
-  //     channel.message({ time: Date.now(), msg: 'hi'}, function(err) {
-  //       if (err) {
-  //         console.log(err);
-  //       }
-  //       console.log("GI success");
-
-  //     });
-  //   });
-  // });
-// })();
-
-
 function GoInstantService() {
   var self = this;
   BenchmarkService.apply( self, arguments );
@@ -56,10 +19,10 @@ function GoInstantService() {
 
     self.benchmark.on( 'set', { local: true }, function( value, context ) {
       console.log(value);
-      // self._onMessage( value );
+      self._onMessage( value );
     } );
 
-    // self._onReady();
+    self._onReady();
   } );
 }
 GoInstantService.prototype = new BenchmarkService;

@@ -1,24 +1,3 @@
-// (function() {
-  
-//   var pusherSubscriber = new Pusher('a8536d1bddd6f5951242', { authEndpoint: '/auth' });
-//   var subscriberChannel = pusherSubscriber.subscribe('private-test-channel');
-
-//   var pusherPublisher = new Pusher('a8536d1bddd6f5951242', { authEndpoint: '/auth' });
-//   var publisherChannel = pusherPublisher.subscribe('private-test-channel');
-
-//   subscriberChannel.bind('pusher:subscription_succeeded', function() {
-//     subscriberChannel.bind('client-test', function(data) {
-//       console.log("Pusher event received");
-//     });
-//   });
-
-//   publisherChannel.bind('pusher:subscription_succeeded', function() {
-//     var data = { text: "testing pusher", time: new Date()};
-//     publisherChannel.trigger('client-test', data);
-//   });    
-// })();
-
-
 function PusherService() {
   BenchmarkService.apply( this, arguments );
   
@@ -43,7 +22,7 @@ function PusherService() {
   });
   this._subscriberChannel.bind( 'client-event', function( message ) {
       console.log( message );
-      // self._onMessage( message );
+      self._onMessage( message );
   });
   
   this._pusherPublisher = new Pusher( 'a8536d1bddd6f5951242' );
@@ -57,7 +36,7 @@ PusherService.prototype = new BenchmarkService;
 PusherService.prototype._subscriptionSucceeded = function() {
   ++this._subscriptionCount;
   if( this._subscriptionCount === 2) {
-      // this._onReady();
+      this._onReady();
   }
 };
 

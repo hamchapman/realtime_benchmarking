@@ -1,26 +1,3 @@
-// (function() {
-
-//   var pubnub = PUBNUB.init({
-//     publish_key: 'pub-c-28b03a80-5f93-4d3c-a431-e08e20e7e446',
-//     subscribe_key: 'sub-c-170fcba8-9973-11e3-8d39-02ee2ddab7fe'
-//   });
-
-//   pubnub.subscribe({
-//     channel: "pubnubChannel",
-//     message: function(m) { 
-//       console.log(m); 
-//      },
-//     connect: function() {
-//       pubnub.publish({
-//         channel: "pubnubChannel",
-//         message: 'Hello PubNub'
-//       });
-//     }
-//   });
- 
-// })();
-
-
 function PubnubService() {
   BenchmarkService.apply( this, arguments );
   
@@ -41,7 +18,7 @@ function PubnubService() {
 
     callback   : function(message) {
       console.log(message);
-      // self._onMessage( message );
+      self._onMessage( message );
     },
 
     disconnect : function() {        // LOST CONNECTION.
@@ -56,11 +33,7 @@ function PubnubService() {
     },
 
     connect    : function() {
-      // self._onReady();
-      self.pubnub.publish({
-        channel : self._channelName,
-        message : {message: "hello pubnub", time: new Date()}
-      });
+      self._onReady();
     }
   });
 }

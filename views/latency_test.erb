@@ -1,0 +1,21 @@
+<html>
+  <head></head>
+  <body>
+    <script type="text/javascript">  
+
+        console.log("hello");
+
+        var services = [
+            PubnubService,
+            PusherService,
+            RealtimeCoService,
+            FirebaseService,
+            GoInstantService
+        ];
+          
+        var runner = new BenchmarkRunner( services, { logToConsole: true } );
+        runner.start();
+
+    </script>
+  </body>
+</html>

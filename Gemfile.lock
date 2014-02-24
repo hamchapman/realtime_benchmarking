@@ -1,26 +1,70 @@
 GEM
   remote: http://rubygems.org/
   specs:
+    addressable (2.3.5)
     bson (1.9.2)
     bson_ext (1.9.2)
       bson (~> 1.9.2)
+    coderay (1.1.0)
+    cookiejar (0.3.1)
     daemons (1.1.9)
+    em-http-request (1.1.2)
+      addressable (>= 2.3.4)
+      cookiejar
+      em-socksify (>= 0.3)
+      eventmachine (>= 1.0.3)
+      http_parser.rb (>= 0.6.0)
+    em-socksify (0.3.0)
+      eventmachine (>= 1.0.0.beta.4)
     ethon (0.6.3)
       ffi (>= 1.3.0)
       mime-types (~> 1.18)
     eventmachine (1.0.3)
+    faye (1.0.1)
+      cookiejar (>= 0.3.0)
+      em-http-request (>= 0.3.0)
+      eventmachine (>= 0.12.0)
+      faye-websocket (>= 0.7.0)
+      multi_json (>= 1.0.0)
+      rack (>= 1.0.0)
+      websocket-driver (>= 0.3.0)
+    faye-websocket (0.7.2)
+      eventmachine (>= 0.12.0)
+      websocket-driver (>= 0.3.1)
     ffi (1.9.3)
     firebase (0.1.6)
       json
       typhoeus (>= 0.6.1)
+    gene_pool (1.3.2)
     haml (4.0.5)
       tilt
+    http_parser.rb (0.6.0)
+    httparty (0.13.0)
+      json (~> 1.8)
+      multi_xml (>= 0.5.2)
     httpclient (2.3.4.1)
     json (1.8.1)
+    method_source (0.8.2)
     mime-types (1.25.1)
     mongo (1.9.2)
       bson (~> 1.9.2)
     multi_json (1.8.4)
+    multi_xml (0.5.5)
+    persistent_http (1.0.6)
+      gene_pool (>= 1.3)
+    persistent_httparty (0.1.1)
+      httparty (~> 0.9)
+      persistent_http
+    pry (0.9.12.6)
+      coderay (~> 1.0)
+      method_source (~> 0.8)
+      slop (~> 3.4)
+    pubnub (3.4.1)
+      em-http-request
+      eventmachine
+      httparty
+      json
+      persistent_httparty
     pusher (0.12.0)
       httpclient (~> 2.3.0)
       multi_json (~> 1.0)
@@ -30,12 +74,14 @@ GEM
     rack (1.5.2)
     rack-protection (1.5.2)
       rack
-    redis (3.0.7)
+    rufus-scheduler (3.0.6)
+      tzinfo
     signature (0.1.7)
     sinatra (1.4.4)
       rack (~> 1.4)
       rack-protection (~> 1.4)
       tilt (~> 1.3, >= 1.3.4)
+    slop (3.4.7)
     thin (1.6.1)
       daemons (>= 1.0.9)
       eventmachine (>= 1.0.0)
@@ -43,7 +89,9 @@ GEM
     tilt (1.4.1)
     typhoeus (0.6.7)
       ethon (~> 0.6.2)
+    tzinfo (0.3.38)
     websocket (1.0.7)
+    websocket-driver (0.3.2)
     websocket-native (1.0.0)
 
 PLATFORMS
@@ -51,12 +99,16 @@ PLATFORMS
 
 DEPENDENCIES
   bson_ext
+  faye
+  faye-websocket
   firebase
   haml
   mongo
+  pry
+  pubnub
   pusher
   pusher-client
-  redis
+  rufus-scheduler
   sinatra
   thin
   websocket-native

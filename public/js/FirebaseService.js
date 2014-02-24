@@ -19,7 +19,7 @@ FirebaseService.prototype = new BenchmarkService;
 
 FirebaseService.prototype._connectionStateChanged = function( snap ) {
   if ( snap.val() === true ) {
-    // this._onReady();
+    this._onReady();
   }
 };
 
@@ -30,7 +30,7 @@ FirebaseService.prototype._childAdded = function( data ) {
   // Convert millis since epoch back to data object
   message.time = new Date( message.time );
   console.log(message);
-  // this._onMessage( message );
+  this._onMessage( message );
 };
 
 FirebaseService.prototype.send = function( data ) {

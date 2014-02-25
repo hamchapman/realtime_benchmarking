@@ -60,6 +60,7 @@ class PubnubBenchmarker
     end
     (1..20).each do |num|
       send({time: Time.now, id: num})
+      sleep 0.2
     end
     sleep 2.0
     $latencies_coll.insert( { service: "pubnub", time: Time.now, latency: average_latency } )

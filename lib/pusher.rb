@@ -64,6 +64,7 @@ class PusherBenchmarker
       send({time: Time.now, id: num})
     end
     $latencies_coll.insert( { service: "pusher", time: Time.now, latency: average_latency } )
+    Pusher.trigger('mongo', 'db-update', 'Mongo updated')
     @latency_benchmarks = []
     unsubscribe
     @client = nil

@@ -23,7 +23,7 @@ class CompetitorAnalysisTesting < Sinatra::Base
     
     scheduler = Rufus::Scheduler.new
     set :scheduler, scheduler
-    # scheduler.every('20s') do
+    # scheduler.every('30s') do
     #   puts "Running tests"
     #   runner = ServicesRunner.new "tester"
     #   runner.benchmark_latencies
@@ -44,22 +44,21 @@ class CompetitorAnalysisTesting < Sinatra::Base
   end
 
   get '/latency_test' do
-    # pb = PusherBenchmarker.new "chicken"
-    # sleep 1.0
-    # pb.send({ time: Time.now })
-    # sleep 1
-    # settings.mongo_db['test'].insert({test: "1382"})
-    # $latencies.insert({time: Time.now, latency: 1398})
     # rtc = RealtimeCoBenchmarker.new "chicken"
     # sleep 2
     # rtc.connect
     # sleep 2
     # rtc.send({ time: Time.now })
-    # sleep 1
-    # pn = PubnubBenchmarker.new "chicken"
-    # sleep 1
-    # pn.send({ time: Time.now })
   end
+
+  get '/new_data' do
+    content_type :json
+    graph_data = settings.mongo_db['competitor_benchmarks']['latencies'].find.to_a
+    @pusher_updated_data = retrieve_data_for "pusher", '#ff7f0e', graph_data
+    @pubnub_updated_data = retrieve_data_for "pubnub", '#3c9fad', graph_data
+    combined_data = [@pusher_updated_data, @pubnub_updated_data].to_json
+  end
+  
 
   post '/pusher/auth' do
     response = Pusher[params[:channel_name]].authenticate(params[:socket_id])

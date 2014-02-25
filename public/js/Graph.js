@@ -1,9 +1,6 @@
 (function() {
 
-  $.ajax({
-    type: 'GET',
-    url: '/latency_test'
-  });
+  
 
   function sinAndCos() {
     var sin = [],sin2 = [],

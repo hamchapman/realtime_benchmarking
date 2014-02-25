@@ -23,11 +23,11 @@ class CompetitorAnalysisTesting < Sinatra::Base
     
     scheduler = Rufus::Scheduler.new
     set :scheduler, scheduler
-    # scheduler.every('30s') do
-    #   puts "Running tests"
-    #   runner = ServicesRunner.new "tester"
-    #   runner.benchmark_latencies
-    # end
+    scheduler.every('30s') do
+      puts "Running tests"
+      runner = ServicesRunner.new "tester"
+      runner.benchmark_latencies
+    end
   end
 
   Pusher.app_id = '66498'

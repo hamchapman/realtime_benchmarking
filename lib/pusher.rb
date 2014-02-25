@@ -4,12 +4,12 @@ require 'json'
 
 class PusherBenchmarker
 
-  attr_reader :ready
+  attr_reader :ready, :ready_for_next_tests
 
   def initialize channel
     @channel = channel
     setup
-    @latency_benchmarks = []
+    @benchmarks = []
     @ready = false
 
     @client.bind("pusher:connection_established") do |data|
@@ -33,6 +33,10 @@ class PusherBenchmarker
     @client.connect(true)
   end
 
+  def disconnect
+    @client.disconnect
+  end
+
   def subscribe
     @client[@channel].bind('pusher:subscription_succeeded') do |data|
     end
@@ -44,12 +48,13 @@ class PusherBenchmarker
       latency = (received - sent) * 1000
       puts latency
       puts data.inspect
-      @latency_benchmarks << { service: "pusher", time: Time.now, latency: latency }
+      @benchmarks << { service: "pusher", time: Time.now, latency: latency }
     end
   end
 
   def unsubscribe
     @client.unsubscribe @channel
+    @ready = false
   end
     
   def send message
@@ -63,25 +68,45 @@ class PusherBenchmarker
     (1..20).each do |num|
       send({time: Time.now, id: num})
     end
+    sleep 2.0
     $latencies_coll.insert( { service: "pusher", time: Time.now, latency: average_latency } )
-    Pusher.trigger('mongo', 'db-update', 'Mongo updated')
-    @latency_benchmarks = []
-    unsubscribe
-    @client = nil
+    Pusher.trigger('mongo', 'latencies-update', 'Mongo updated')
+    @benchmarks = []
   end
 
   def average_latency
-    puts @latency_benchmarks.inspect
-    @latency_benchmarks.inject(0) { |memo, obj| memo += obj[:latency] } / @latency_benchmarks.length
+    puts @benchmarks.inspect
+    @benchmarks.inject(0) { |memo, obj| memo += obj[:latency] } / @benchmarks.length
   end
 
 
   def benchmark_reliability
+    while (!ready)
+      sleep(1)
+    end
+    @ready_for_next_tests = false
+    (1..20).each do |num|
+      send({time: Time.now, id: num})
+    end
+    sleep 2.0
+    $reliabilities_coll.insert( { service: "pusher", time: Time.now, reliability: calculate_reliability_percentage } )
+    Pusher.trigger('mongo', 'reliabilities-update', 'Mongo updated')
+    @benchmarks = []
+    reset_client
+  end
 
+  def calculate_reliability_percentage
+    (@benchmarks.length / 20) * 100
   end
 
   def benchmark_speed
 
-  end  
+  end
+
+  def reset_client
+    unsubscribe
+    disconnect
+    @client = nil
+  end
   
 end

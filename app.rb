@@ -20,13 +20,16 @@ class CompetitorAnalysisTesting < Sinatra::Base
     set :mongo_db, conn.db('test')
 
     $latencies_coll =  mongo_db['competitor_benchmarks']['latencies']
+    $reliabilities_coll =  mongo_db['competitor_benchmarks']['reliabilities']
     
     scheduler = Rufus::Scheduler.new
     set :scheduler, scheduler
-    scheduler.every('30s') do
+    scheduler.every('40s') do
       puts "Running tests"
       runner = ServicesRunner.new "tester"
-      runner.benchmark_latencies
+      runner.run_benchmarks
+      # runner.benchmark_latencies "latency"
+      # runner.benchmark_reliabilities "reliability"
     end
   end
 
@@ -35,9 +38,10 @@ class CompetitorAnalysisTesting < Sinatra::Base
   Pusher.secret = '0c80607ae8d716a716bb'
 
   get '/' do 
-    graph_data = settings.mongo_db['competitor_benchmarks']['latencies'].find.to_a
+    graph_data = settings.mongo_db['competitor_benchmarks']['latencies'].find({}, sort: ["time", 1]).to_a
     @pusher_data = retrieve_data_for "pusher", '#ff7f0e', graph_data
     @pubnub_data = retrieve_data_for "pubnub", '#3c9fad', graph_data
+    @realtime_co_data = retrieve_data_for "realtime_co", '#ad007b', graph_data
 
     puts @pusher_data.inspect
     haml :index
@@ -51,12 +55,13 @@ class CompetitorAnalysisTesting < Sinatra::Base
     # rtc.send({ time: Time.now })
   end
 
-  get '/new_data' do
+  post '/new_data' do
     content_type :json
-    graph_data = settings.mongo_db['competitor_benchmarks']['latencies'].find.to_a
+    graph_data = settings.mongo_db['competitor_benchmarks']['latencies'].find({}, sort: ["time", 1]).to_a
     @pusher_updated_data = retrieve_data_for "pusher", '#ff7f0e', graph_data
     @pubnub_updated_data = retrieve_data_for "pubnub", '#3c9fad', graph_data
-    combined_data = [@pusher_updated_data, @pubnub_updated_data].to_json
+    @realtime_co_updated_data = retrieve_data_for "realtime_co", '#ad007b', graph_data
+    combined_data = [@pusher_updated_data, @pubnub_updated_data, @realtime_co_updated_data].to_json
   end
   
 

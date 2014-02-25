@@ -2,52 +2,54 @@ require_relative 'ortc'
 
 class RealtimeCoBenchmarker
 
-  attr_reader :subscribed
+  attr_reader :ready, :subscribed
 
   def initialize channel
     @channel = channel
     setup
-    @connected = false
+    @benchmarks = []
     @subscribed = false
+    @ready = false
     
     @client.on_connected  do |sender|
-      @connected = true
-      subscribe @channel
+      subscribe
     end
 
 
     @client.on_subscribed do |sender, channel|
-      puts "I've set subscribed true"
-      @subscribed = true
+      @ready = true
     end
 
     @client.on_unsubscribed do |sender, channel|
       disconnect
     end
+
+    connect
   end
 
   def setup
     @client = ORTC::OrtcClient.new
     @client.cluster_url = 'http://ortc-developers.realtime.co/server/2.1'
-    puts "I'm setting up"
   end
 
   def connect
-    puts "I'm connecting"
-    @client.connect 'BNrppn', 'NO_AUTH_NEEDED'
-    puts @client.is_connected
+    @client.connect 'BNrppn'
   end
 
   def send message
-    puts @client.is_connected
-    puts "I'm sending"
     @client.send(@channel, message.to_json)
   end
 
   def subscribe
-    puts "I'm subscribing"
     @client.subscribe(@channel, true) do |sender, channel, message| 
-      puts "Message received on (#{channel}): #{message}" 
+      puts message.inspect
+      message = JSON.parse(message)
+      sent = (Time.parse(message["time"])).to_f
+      received = Time.now.to_f
+      latency = (received - sent) * 1000
+      puts message.inspect
+      puts latency
+      @benchmarks << { service: "realtime_co", time: Time.now, latency: latency }
     end
   end
 
@@ -60,15 +62,53 @@ class RealtimeCoBenchmarker
   end
 
   def benchmark_latency
-
+    while (!ready)
+      sleep(1)
+    end
+    (1..20).each do |num|
+      send({time: Time.now, id: num})
+      sleep 0.2
+    end
+    sleep 2.0
+    $latencies_coll.insert( { service: "realtime_co", time: Time.now, latency: average_latency } )
+    Pusher.trigger('mongo', 'latencies-update', 'Mongo updated')
+    @benchmarks = []
   end
 
-  def benchmark_reliability
+  def average_latency
+    puts @benchmarks.inspect
+    @benchmarks.inject(0) { |memo, obj| memo += obj[:latency] } / @benchmarks.length
+  end
 
+
+  def benchmark_reliability
+    while (!ready)
+      sleep(1)
+    end
+    @ready_for_next_tests = false
+    (1..20).each do |num|
+      send({time: Time.now, id: num})
+      sleep 0.2
+    end
+    sleep 2.0
+    $reliabilities_coll.insert( { service: "realtime_co", time: Time.now, reliability: calculate_reliability_percentage } )
+    Pusher.trigger('mongo', 'reliabilities-update', 'Mongo updated')
+    @benchmarks = []
+    reset_client
+  end
+
+  def calculate_reliability_percentage
+    (@benchmarks.length / 20) * 100
   end
 
   def benchmark_speed
 
+  end
+
+  def reset_client
+    unsubscribe
+    disconnect
+    @client = nil
   end
 
 end

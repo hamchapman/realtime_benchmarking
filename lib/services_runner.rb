@@ -13,27 +13,35 @@ class ServicesRunner
     @pusher = PusherBenchmarker.new channel
     @pubnub = PubnubBenchmarker.new channel
     sleep 2
-    # @realtime_co_client = RealtimeCoBenchmarker.new channel
-    @services += [@pusher, @pubnub]
+    @realtime_co = RealtimeCoBenchmarker.new channel
+    @services += [@pusher, @pubnub, @realtime_co]
+    puts @services.inspect
   end
 
-  def benchmark_latencies
+  def benchmark_latencies 
     puts @services.inspect
     @services.each { |service| service.benchmark_latency }
-  end
-
-  def benchmark_speeds
-    @services.each { |service| service.benchamark_speed }
+    sleep 2
   end
 
   def benchmark_reliabilities
-    @services.each { |service| service.benchamrk_reliability }
+    puts @services.inspect
+    @services.each { |service| service.benchmark_reliability }
+    sleep 2
+  end
+
+  def benchmark_speeds
+    @services.each { |service| service.benchamark_speed } 
   end
 
   def run_benchmarks
-    benchmark_latencies
+    benchmark_latencies 
     benchmark_reliabilities
-    benchmark_speeds
+    # benchmark_speeds 
+  end
+
+  def reset_benchmarkers
+    @services.each { |service| service = nil }
   end
 
 end

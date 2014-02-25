@@ -8,7 +8,7 @@ class PubnubBenchmarker
   def initialize channel
     @channel = channel
     @ready = false
-    @latency_benchmarks = []
+    @benchmarks = []
     connect
     subscribe
   end
@@ -25,6 +25,10 @@ class PubnubBenchmarker
           @ready = true
         }
     )
+  end
+
+  def disconnect
+
   end
 
   def send message
@@ -45,7 +49,7 @@ class PubnubBenchmarker
           latency = (received - sent) * 1000
           puts data.message.inspect
           puts latency
-          @latency_benchmarks << { service: "pubnub", time: Time.now, latency: latency }
+          @benchmarks << { service: "pubnub", time: Time.now, latency: latency }
        }
     )
   end
@@ -64,22 +68,43 @@ class PubnubBenchmarker
     end
     sleep 2.0
     $latencies_coll.insert( { service: "pubnub", time: Time.now, latency: average_latency } )
-    @latency_benchmarks = []
-    unsubscribe
-    @client = nil
+    Pusher.trigger('mongo', 'latencies-update', 'Mongo updated')
+    @benchmarks = []
   end
 
   def average_latency
-    puts @latency_benchmarks.inspect
-    @latency_benchmarks.inject(0) { |memo, obj| memo += obj[:latency] } / @latency_benchmarks.length
+    puts @benchmarks.inspect
+    @benchmarks.inject(0) { |memo, obj| memo += obj[:latency] } / @benchmarks.length
   end
 
   def benchmark_reliability
+    while (!ready)
+      sleep(1)
+    end
+    @ready_for_next_tests = false
+    (1..20).each do |num|
+      send({time: Time.now, id: num})
+      sleep 0.2
+    end
+    sleep 2.0
+    $reliabilities_coll.insert( { service: "pubnub", time: Time.now, reliability: calculate_reliability_percentage } )
+    Pusher.trigger('mongo', 'reliabilities-update', 'Mongo updated')
+    @benchmarks = []
+    reset_client
+  end
 
+  def calculate_reliability_percentage
+    (@benchmarks.length / 20) * 100
   end
 
   def benchmark_speed
 
+  end
+
+  def reset_client
+    unsubscribe
+    # disconnect
+    @client = nil
   end
 
 end

@@ -36,18 +36,11 @@ class CompetitorAnalysisTesting < Sinatra::Base
 
   get '/' do 
     graph_data = settings.mongo_db['competitor_benchmarks']['latencies'].find.to_a
-    pusher_data = graph_data.select { |entry| entry['service'] == 'pusher' }
-    pusher_data.each do |hash| 
-      hash[:x] = hash.delete "time"
-      hash[:y] = hash.delete "latency"
-      hash.delete "_id"
-      hash.delete "service"
-    end
+    @pusher_data = retrieve_data_for "pusher", '#ff7f0e', graph_data
+    @pubnub_data = retrieve_data_for "pubnub", '#3c9fad', graph_data
 
-    @pusher_data_for_d3 = [ { values: pusher_data, key: 'Pusher', color: '#ff7f0e' } ]
-
-    puts pusher_data.inspect
-    haml :index, :locals => { pusher_data: @pusher_data_for_d3 }
+    puts @pusher_data.inspect
+    haml :index
   end
 
   get '/latency_test' do
@@ -68,24 +61,25 @@ class CompetitorAnalysisTesting < Sinatra::Base
     # pn.send({ time: Time.now })
   end
 
-  # post '/new_benchmark' do
-  #   content_type :json
-  #   new_id = settings.mongo_db['test'].insert params
-  #   puts "Saving to mongo"
-  # end
-
   post '/pusher/auth' do
     response = Pusher[params[:channel_name]].authenticate(params[:socket_id])
     content_type :json
     return response.to_json
   end
 
-  # helpers do
-  #   def document_by_id id
-  #     id = object_id(id) if String === id
-  #     settings.mongo_db['latnecies'].find_one(:_id => id).to_json
-  #   end
-  # end
+  helpers do
+    def retrieve_data_for service, colour, data
+      service_data = data.select { |entry| entry['service'] == service }
+      service_data.each do |hash|
+        hash[:x] = hash.delete "time"
+        hash[:y] = hash.delete "latency"
+        hash.delete "_id"
+        hash.delete "service"
+      end
+
+      { values: service_data, key: service, color: colour }.to_json
+    end
+  end
 
   run! if app_file == $0
 end

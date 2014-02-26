@@ -3,37 +3,61 @@
   %head
     %title Competitor Analysis
     %link{:rel => :stylesheet, :type => :"text/css", :href => "/stylesheets/nv.d3.css"}
+    %link{:rel => :stylesheet, :type => :"text/css", :href => "/stylesheets/index.css"}
   %body
-    %h3 Competitor Analysis
     %script{src: "http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"}
     %script{src: "http://js.pusher.com/2.1/pusher.min.js"}
     %script{src: "../js/d3.js"}
     %script{src: "../js/nv.d3.js"}
     %script{src: "../js/Graph.js"}
-    
 
+    %header.main-heading Competitor Analysis
+
+    %section.sidebar
+      %div.reliability-sidebar Service Reliability
+
+    %section.content
+
+      %section.reliabilities
+        %div.service-reliabilities
+          %div.service-reliability
+            %div.service-title.pusher-title
+              Pusher
+            %h3.pusher-reliability-score
+          %div.service-reliability
+            %div.service-title.pubnub-title
+              PubNub
+            %h3.pubnub-reliability-score
+          %div.service-reliability
+            %div.service-title.realtimeco-title
+              RealtimeCo
+            %h3.realtimeco-reliability-score
+
+      #chart
+        %svg
+    
     :javascript
       nv.addGraph(function() {
         var chart = nv.models.lineChart()
-                      .margin({left: 100, bottom: 120})  
-                      .useInteractiveGuideline(true)  
-                      .transitionDuration(350)  
-                      .showLegend(true)       
-                      .showYAxis(true)        
-                      .showXAxis(true);
+          .margin({left: 100, bottom: 120})  
+          .useInteractiveGuideline(true)  
+          .transitionDuration(350)  
+          .showLegend(true)       
+          .showYAxis(true)        
+          .showXAxis(true);
       
         chart.xAxis 
-            .axisLabel('Date')
-            .rotateLabels(-45)
-            .tickFormat(function(d) { return d3.time.format('%d-%m-%Y %H:%M:%S')(new Date(d)) });
+          .axisLabel('Date')
+          .rotateLabels(-45)
+          .tickFormat(function(d) { return d3.time.format('%d-%m-%Y %H:%M:%S')(new Date(d)) });
        
         chart.yAxis
-            .axisLabel('Latency (ms)')
-            .tickFormat(d3.format('.0f'));
+          .axisLabel('Latency (ms)')
+          .tickFormat(d3.format('.0f'));
        
-        var pusherData = #{@pusher_data};
-        var pubnubData = #{@pubnub_data};
-        var realtimecoData = #{@realtime_co_data};
+        var pusherData = #{@pusher_latency};
+        var pubnubData = #{@pubnub_latency};
+        var realtimecoData = #{@realtime_co_latency};
 
         // Make the dates easy for d3 to work with
         pusherData["values"].forEach(function(hash) {
@@ -51,13 +75,29 @@
         var serviceData = [pusherData, pubnubData, realtimecoData];
        
         d3.select('#chart svg')    
-            .datum(serviceData)         
-            .call(chart);
+          .datum(serviceData)         
+          .call(chart);
        
         //Update the chart when window resizes.
         nv.utils.windowResize(function() { chart.update() });
         return chart;
       });
+
+      var pusherReliability = #{@pusher_reliability};
+      $(".pusher-reliability-score").text(pusherReliability["reliability"] + "%")
+      $(".pusher-reliability-score").css( "color", pusherReliability["color"] );
+      $(".pusher-title").css( "color", pusherReliability["color"] );
+
+      var pubnubReliability = #{@pubnub_reliability};
+      $(".pubnub-reliability-score").text(pubnubReliability["reliability"] + "%")
+      $(".pubnub-reliability-score").css( "color", pubnubReliability["color"] );
+      $(".pubnub-title").css( "color", pubnubReliability["color"] );
+
+      var realtimecoReliability = #{@realtime_co_reliability};
+      $(".realtimeco-reliability-score").text(realtimecoReliability["reliability"] + "%")
+      $(".realtimeco-reliability-score").css( "color", realtimecoReliability["color"] );
+      $(".realtimeco-title").css( "color", realtimecoReliability["color"] );
+
 
       var pusher = new Pusher( 'a8536d1bddd6f5951242' );
       var mongoUpdateChannel = pusher.subscribe( 'mongo' );
@@ -71,20 +111,21 @@
                     
                     nv.addGraph(function() {
                       var chart = nv.models.lineChart()
-                      .margin({left: 100, bottom: 100})  
-                      .useInteractiveGuideline(true)  
-                      .transitionDuration(350)  
-                      .showLegend(true)       
-                      .showYAxis(true)        
-                      .showXAxis(true);
+                        .margin({left: 100, bottom: 100})  
+                        .useInteractiveGuideline(true)  
+                        .transitionDuration(350)  
+                        .showLegend(true)       
+                        .showYAxis(true)        
+                        .showXAxis(true);
+                      
                       chart.xAxis 
-                      .axisLabel('Date')
-                      .rotateLabels(-45)
-                      .tickFormat(function(d) { return d3.time.format('%d-%m-%Y %H:%M:%S')(new Date(d)) });
+                        .axisLabel('Date')
+                        .rotateLabels(-45)
+                        .tickFormat(function(d) { return d3.time.format('%d-%m-%Y %H:%M:%S')(new Date(d)) });
                        
                       chart.yAxis
-                      .axisLabel('Latency (ms)')
-                      .tickFormat(d3.format('.0f'));
+                        .axisLabel('Latency (ms)')
+                        .tickFormat(d3.format('.0f'));
     
                       var pusherData = JSON.parse(updatedData[0]);
                       var pubnubData = JSON.parse(updatedData[1]);
@@ -106,8 +147,8 @@
                       var serviceData = [pusherData, pubnubData, realtimecoData];
 
                       d3.select('#chart svg')    
-                      .datum(serviceData)
-                      .call(chart);
+                        .datum(serviceData)
+                        .call(chart);
 
                       //Update the chart when window resizes.
                       nv.utils.windowResize(function() { chart.update() });
@@ -122,6 +163,4 @@
       #chart svg {
         height: 500px;
       }
-    #chart
-      %svg
 

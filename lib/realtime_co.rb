@@ -15,7 +15,6 @@ class RealtimeCoBenchmarker
       subscribe
     end
 
-
     @client.on_subscribed do |sender, channel|
       @ready = true
     end
@@ -34,6 +33,10 @@ class RealtimeCoBenchmarker
 
   def connect
     @client.connect 'BNrppn'
+  end
+
+  def disconnect
+    # @client.disconnect
   end
 
   def send message
@@ -55,10 +58,6 @@ class RealtimeCoBenchmarker
 
   def unsubscribe
     @client.unsubscribe(@channel)
-  end
-
-  def disconnect
-    @client.disconnect
   end
 
   def benchmark_latency
@@ -107,7 +106,7 @@ class RealtimeCoBenchmarker
 
   def reset_client
     unsubscribe
-    disconnect
+    # disconnect
     @client = nil
   end
 

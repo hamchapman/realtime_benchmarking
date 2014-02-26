@@ -5,6 +5,7 @@ GEM
     bson (1.9.2)
     bson_ext (1.9.2)
       bson (~> 1.9.2)
+    chronic (0.10.2)
     coderay (1.1.0)
     cookiejar (0.3.1)
     daemons (1.1.9)
@@ -99,6 +100,7 @@ PLATFORMS
 
 DEPENDENCIES
   bson_ext
+  chronic
   faye
   faye-websocket
   firebase

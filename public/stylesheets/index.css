@@ -1,0 +1,27 @@
+.service-reliability {
+  float: left;
+  text-align: center;
+  margin-left: 20px;
+}
+
+.reliabilities {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.service-reliabilities {
+  width: 250px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.sidebar {
+  float: left;
+  width: 20%;
+}
+
+.content {
+  float: left;
+  width: 80%;
+}

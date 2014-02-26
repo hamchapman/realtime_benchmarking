@@ -11,7 +11,7 @@ require './lib/realtime_co'
 require './lib/pubnub'
 require './lib/services_runner'
 
-class CompetitorAnalysisTesting < Sinatra::Base
+class BenchmarkAnalysis < Sinatra::Base
 
   @@pusher_colour = '#ff7f0e'
   @@pubnub_colour = '#3c9fad'

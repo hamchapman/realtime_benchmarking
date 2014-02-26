@@ -19,7 +19,7 @@
       %input{:type =>"text", :name =>"time", :class => "update-graph-text", :placeholder => "yesterday morning"}
       %input{:type => "submit", :value => "Update", :class => "update-graph-button"}
   
-    %div.current-timeframe
+    %div.current-timeframe{ data: { timeframe: "last week" } }
 
     %section.sidebar
       %div.reliability-sidebar Reliability
@@ -46,10 +46,6 @@
         %svg
     
     :javascript
-      $(document).ready(function(){ 
-        $(".current-timeframe").attr("data-timeframe", "last week");
-      });
-
       $(".update-graph-button").on( "click", function() {
         var time_data = $(".update-graph-text").val();
         $(".current-timeframe").attr("data-timeframe", time_data);
@@ -78,7 +74,7 @@
                       chart.yAxis
                         .axisLabel('Latency (ms)')
                         .tickFormat(d3.format('.0f'));
-    
+
                       var pusherData = JSON.parse(updatedData[0]);
                       var pubnubData = JSON.parse(updatedData[1]);
                       var realtimecoData = JSON.parse(updatedData[2]);

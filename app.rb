@@ -1,6 +1,7 @@
 require 'sinatra/base'
 require 'rufus-scheduler'
 require 'mongo'
+require 'uri'
 require 'bson'
 require 'json'
 require 'haml'
@@ -19,14 +20,25 @@ class BenchmarkAnalysis < Sinatra::Base
 
   include Mongo
 
-  configure do
-    conn = MongoClient.new("localhost", 27017)
-    set :mongo_connection, conn
-    set :mongo_db, conn.db('test')
+  def get_connection
+    return @mongo_db if @mongo_db
+    db = URI.parse(ENV['MONGOHQ_URL'])
+    db_name = db.path.gsub(/^\//, '')
+    db_connection = Mongo::Connection.new(db.host, db.port).db(db_name)
+    db_connection.authenticate(db.user, db.password) unless (db.user.nil? || db.user.nil?)
+    db_connection
+  end
+  
+  # SOMETHING LIKE THIS TO SETUP HEROKU / LOCALLY 
 
-    $latencies_coll =  mongo_db['competitor_benchmarks']['latencies']
-    $reliabilities_coll =  mongo_db['competitor_benchmarks']['reliabilities']
+  if ENV['MONGOHQ_URL']
+    set :mongo_db, get_connection
+  else
+    conn = MongoClient.new("localhost", 27017)
+    set :mongo_db, conn.db('test')
+  end
     
+  configure do
     scheduler = Rufus::Scheduler.new
     set :scheduler, scheduler
     scheduler.every('1m') do
@@ -36,9 +48,29 @@ class BenchmarkAnalysis < Sinatra::Base
     end
   end
 
+  # configure do
+  #   conn = MongoClient.new("localhost", 27017)
+  #   # set :mongo_connection, conn
+  #   set :mongo_db, conn.db('test')
+
+  #   $latencies_coll =  mongo_db['competitor_benchmarks']['latencies']
+  #   $reliabilities_coll =  mongo_db['competitor_benchmarks']['reliabilities']
+    
+  #   scheduler = Rufus::Scheduler.new
+  #   set :scheduler, scheduler
+  #   scheduler.every('1m') do
+  #     puts "Running tests"
+  #     runner = ServicesRunner.new "tester"
+  #     runner.run_benchmarks
+  #   end
+  # end
+
   Pusher.app_id = '66498'
   Pusher.key = 'a8536d1bddd6f5951242'
   Pusher.secret = '0c80607ae8d716a716bb'
+
+  $latencies_coll =  mongo_db['competitor_benchmarks']['latencies']
+  $reliabilities_coll =  mongo_db['competitor_benchmarks']['reliabilities']
 
   get '/' do 
     latency_data = settings.mongo_db['competitor_benchmarks']['latencies'].find({}, sort: ["time", 1]).to_a
@@ -54,29 +86,14 @@ class BenchmarkAnalysis < Sinatra::Base
     haml :index
   end
 
-  # post '/new_data' do
-  #   content_type :json
-  #   latency_data = settings.mongo_db['competitor_benchmarks']['latencies'].find({}, sort: ["time", 1]).to_a
-  #   @pusher_updated_latency = latency_data_for 'pusher', @@pusher_colour, latency_data
-  #   @pubnub_updated_latency = latency_data_for 'pubnub', @@pubnub_colour, latency_data
-  #   @realtime_co_updated_latency = latency_data_for 'realtime_co', @@realtime_co_colour, latency_data
-  #   combined_data = [@pusher_updated_latency, @pubnub_updated_latency, @realtime_co_updated_latency].to_json
-  # end
-
   post '/new_data' do
     content_type :json
     since_time = Chronic.parse(params["since"])
-    puts "*******************************"
-    puts params.inspect
-    puts params["since"]
-    puts since_time
     if since_time
       latency_data = settings.mongo_db['competitor_benchmarks']['latencies'].find({ time: { "$gt" => since_time } }, sort: ["time", 1]).to_a
     else
       latency_data = settings.mongo_db['competitor_benchmarks']['latencies'].find({ time: { "$gt" => Time.now - 7*24*60*60 } }, sort: ["time", 1]).to_a
     end
-    # puts latency_data.inspect
-    # latency_data = settings.mongo_db['competitor_benchmarks']['latencies'].find({}, sort: ["time", 1]).to_a
     @pusher_updated_latency = latency_data_for 'pusher', @@pusher_colour, latency_data
     @pubnub_updated_latency = latency_data_for 'pubnub', @@pubnub_colour, latency_data
     @realtime_co_updated_latency = latency_data_for 'realtime_co', @@realtime_co_colour, latency_data

@@ -19,15 +19,6 @@ class BenchmarkAnalysis < Sinatra::Base
   @@realtime_co_colour = '#ad007b'
 
   include Mongo
-
-  def get_connection
-    return @mongo_db if @mongo_db
-    db = URI.parse(ENV['MONGOHQ_URL'])
-    db_name = db.path.gsub(/^\//, '')
-    db_connection = Mongo::Connection.new(db.host, db.port).db(db_name)
-    db_connection.authenticate(db.user, db.password) unless (db.user.nil? || db.user.nil?)
-    db_connection
-  end
   
   # SOMETHING LIKE THIS TO SETUP HEROKU / LOCALLY 
 
@@ -125,6 +116,15 @@ class BenchmarkAnalysis < Sinatra::Base
       reliability = service_data.inject(0) { |memo, obj| memo += obj['reliability'] } / service_data.length
 
       { service: service, reliability: reliability, color: colour }.to_json
+    end
+
+    def get_connection
+      # return mongo_db if mongo_db
+      db = URI.parse(ENV['MONGOHQ_URL'])
+      db_name = db.path.gsub(/^\//, '')
+      db_connection = Mongo::Connection.new(db.host, db.port).db(db_name)
+      db_connection.authenticate(db.user, db.password) unless (db.user.nil? || db.user.nil?)
+      db_connection
     end
   end
 

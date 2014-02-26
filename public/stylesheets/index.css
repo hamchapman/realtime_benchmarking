@@ -1,7 +1,13 @@
+body {
+  font-family: 'Open Sans', sans-serif;
+}
+
+textarea, input { outline: none; }
+
 .service-reliability {
   float: left;
   text-align: center;
-  margin-left: 20px;
+  margin-left: 70px;
 }
 
 .reliabilities {
@@ -11,17 +17,77 @@
 }
 
 .service-reliabilities {
-  width: 250px;
   margin-left: auto;
   margin-right: auto;
 }
 
 .sidebar {
   float: left;
-  width: 20%;
+  width: 10%;
+  font-weight: 600;
+  font-size: 1.3em;
 }
 
 .content {
   float: left;
-  width: 80%;
+  width: 90%;
+}
+
+.main-heading {
+  text-align: center;
+  width: 40%;
+  margin-top: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 20px;
+  font-size: 2.4em;
+}
+
+.reliability-sidebar {
+  margin-top: 10%;
+  padding-left: 20px;
+}
+
+.latency-sidebar {
+  margin-top: 240px;
+  padding-left: 20px;
+}
+
+.timeframe {
+  font-size: 1.3em;
+  margin-left: auto;
+  margin-right: auto;
+  width: 520px;
+  margin-bottom: 20px;
+}
+
+.current-timeframe {
+  display:none
+}
+
+input[type=text] {
+  padding:5px; 
+  border:2px 
+  solid #ccc;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  font-size: 0.8em;
+}
+
+input:focus::-webkit-input-placeholder { color:transparent; }
+input:focus:-moz-placeholder { color:transparent; }
+
+input[type=text]:focus {
+  border-color:#d80114; 
+}
+
+input[type=submit] {
+  padding: 5px 15px; 
+  border: 0 none;
+  cursor:pointer;
+  -webkit-border-radius: 5px;
+  border-radius: 5px; 
+  background: #d80114;
+  color: white;
+  font-size: 0.7em;
 }

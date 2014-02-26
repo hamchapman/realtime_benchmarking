@@ -4,6 +4,7 @@
     %title Competitor Analysis
     %link{:rel => :stylesheet, :type => :"text/css", :href => "/stylesheets/nv.d3.css"}
     %link{:rel => :stylesheet, :type => :"text/css", :href => "/stylesheets/index.css"}
+    %link{:rel => :stylesheet, :type => :"text/css", :href => 'http://fonts.googleapis.com/css?family=Open+Sans:400,700,600,300'}
   %body
     %script{src: "http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"}
     %script{src: "http://js.pusher.com/2.1/pusher.min.js"}
@@ -12,9 +13,17 @@
     %script{src: "../js/Graph.js"}
 
     %header.main-heading Competitor Analysis
+    
+    %div.timeframe
+      I want to see data since
+      %input{:type =>"text", :name =>"time", :class => "update-graph-text", :placeholder => "yesterday morning"}
+      %input{:type => "submit", :value => "Update", :class => "update-graph-button"}
+  
+    %div.current-timeframe
 
     %section.sidebar
-      %div.reliability-sidebar Service Reliability
+      %div.reliability-sidebar Reliability
+      %div.latency-sidebar Latency
 
     %section.content
 
@@ -37,6 +46,70 @@
         %svg
     
     :javascript
+      $(document).ready(function(){ 
+        $(".current-timeframe").attr("data-timeframe", "last week");
+      });
+
+      $(".update-graph-button").on( "click", function() {
+        var time_data = $(".update-graph-text").val();
+        $(".current-timeframe").attr("data-timeframe", time_data);
+        $.ajax({
+          type: 'POST',
+          url: '/new_data',
+          data: { since: time_data },
+          success: function (response) {
+                    console.log(response);
+                    var updatedData = response;
+                    
+                    nv.addGraph(function() {
+                      var chart = nv.models.lineChart()
+                        .margin({left: 100, bottom: 100})  
+                        .useInteractiveGuideline(true)  
+                        .transitionDuration(350)  
+                        .showLegend(true)       
+                        .showYAxis(true)        
+                        .showXAxis(true);
+                      
+                      chart.xAxis 
+                        .axisLabel('Date')
+                        .rotateLabels(-45)
+                        .tickFormat(function(d) { return d3.time.format('%d-%m-%Y %H:%M:%S')(new Date(d)) });
+                       
+                      chart.yAxis
+                        .axisLabel('Latency (ms)')
+                        .tickFormat(d3.format('.0f'));
+    
+                      var pusherData = JSON.parse(updatedData[0]);
+                      var pubnubData = JSON.parse(updatedData[1]);
+                      var realtimecoData = JSON.parse(updatedData[2]);
+
+                      // Make the dates easy for d3 to work with
+                      pusherData["values"].forEach(function(hash) {
+                        hash["x"] = new Date(hash["x"]);
+                      });
+
+                      pubnubData["values"].forEach(function(hash) {
+                        hash["x"] = new Date(hash["x"]);
+                      });
+
+                      realtimecoData["values"].forEach(function(hash) {
+                        hash["x"] = new Date(hash["x"]);
+                      });
+
+                      var serviceData = [pusherData, pubnubData, realtimecoData];
+
+                      d3.select('#chart svg')    
+                        .datum(serviceData)
+                        .call(chart);
+
+                      //Update the chart when window resizes.
+                      nv.utils.windowResize(function() { chart.update() });
+                      return chart;
+                    });
+          }
+        });
+      });
+
       nv.addGraph(function() {
         var chart = nv.models.lineChart()
           .margin({left: 100, bottom: 120})  
@@ -102,9 +175,11 @@
       var pusher = new Pusher( 'a8536d1bddd6f5951242' );
       var mongoUpdateChannel = pusher.subscribe( 'mongo' );
       mongoUpdateChannel.bind( 'latencies-update', function( message ) {
+        var current_timeframe = $(".current-timeframe").attr("data-timeframe");
         $.ajax({
           type: 'POST',
           url: '/new_data',
+          data: { since: current_timeframe },
           success: function (response) {
                     console.log(response);
                     var updatedData = response;

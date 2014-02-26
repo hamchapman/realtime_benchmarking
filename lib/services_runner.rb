@@ -37,7 +37,8 @@ class ServicesRunner
   def run_benchmarks
     benchmark_latencies 
     benchmark_reliabilities
-    # benchmark_speeds 
+    # benchmark_speeds
+    reset_benchmarkers 
   end
 
   def reset_benchmarkers

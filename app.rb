@@ -54,9 +54,29 @@ class CompetitorAnalysisTesting < Sinatra::Base
     haml :index
   end
 
+  # post '/new_data' do
+  #   content_type :json
+  #   latency_data = settings.mongo_db['competitor_benchmarks']['latencies'].find({}, sort: ["time", 1]).to_a
+  #   @pusher_updated_latency = latency_data_for 'pusher', @@pusher_colour, latency_data
+  #   @pubnub_updated_latency = latency_data_for 'pubnub', @@pubnub_colour, latency_data
+  #   @realtime_co_updated_latency = latency_data_for 'realtime_co', @@realtime_co_colour, latency_data
+  #   combined_data = [@pusher_updated_latency, @pubnub_updated_latency, @realtime_co_updated_latency].to_json
+  # end
+
   post '/new_data' do
     content_type :json
-    latency_data = settings.mongo_db['competitor_benchmarks']['latencies'].find({}, sort: ["time", 1]).to_a
+    since_time = Chronic.parse(params["since"])
+    puts "*******************************"
+    puts params.inspect
+    puts params["since"]
+    puts since_time
+    if since_time
+      latency_data = settings.mongo_db['competitor_benchmarks']['latencies'].find({ time: { "$gt" => since_time } }, sort: ["time", 1]).to_a
+    else
+      latency_data = settings.mongo_db['competitor_benchmarks']['latencies'].find({ time: { "$gt" => Time.now - 7*24*60*60 } }, sort: ["time", 1]).to_a
+    end
+    # puts latency_data.inspect
+    # latency_data = settings.mongo_db['competitor_benchmarks']['latencies'].find({}, sort: ["time", 1]).to_a
     @pusher_updated_latency = latency_data_for 'pusher', @@pusher_colour, latency_data
     @pubnub_updated_latency = latency_data_for 'pubnub', @@pubnub_colour, latency_data
     @realtime_co_updated_latency = latency_data_for 'realtime_co', @@realtime_co_colour, latency_data

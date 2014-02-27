@@ -95,7 +95,7 @@ class PubnubBenchmarker
   end
 
   def benchmark_speed
-
+    puts @client
   end
 
   def reset_client

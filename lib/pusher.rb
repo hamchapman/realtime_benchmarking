@@ -45,8 +45,6 @@ class PusherBenchmarker
       # puts latency
       puts data.inspect
       @benchmarks << { service: "pusher", time: Time.now, latency: latency }
-      # puts "I'm inside the subscribe method where I'm adding things to @benchmarks"
-      # puts @benchmarks.inspect
     end
   end
 
@@ -83,6 +81,8 @@ class PusherBenchmarker
     puts "**********************************************************************"
     puts "**********************************************************************"
     puts "HERE COMES PUSHER RELIABILITY BENCHMARKS"
+    puts "**********************************************************************"
+    puts "**********************************************************************"
     while (!ready)
       sleep(1)
     end
@@ -91,16 +91,6 @@ class PusherBenchmarker
       sleep 0.2
     end
     sleep 2.0
-    puts "**********************************************************************"
-    puts "**********************************************************************"
-    puts "RELIABILITY PERCENTAGE"
-    puts calculate_reliability_percentage
-    puts "**********************************************************************"
-    puts "**********************************************************************"
-    puts "@benchmarks looks like this:"
-    puts @benchmarks.inspect
-    puts "**********************************************************************"
-    puts "**********************************************************************"
     $reliabilities_coll.insert( { service: "pusher", time: Time.now, reliability: calculate_reliability_percentage } )
     Pusher.trigger('mongo', 'reliabilities-update', 'Mongo updated')
     @benchmarks = []
@@ -109,13 +99,11 @@ class PusherBenchmarker
   end
 
   def calculate_reliability_percentage
-    puts "I'm inside the reliability percentage calculation"
-    puts @benchmarks.inspect
-    (@benchmarks.length / 20) * 100
+    (@benchmarks.length / 20.0) * 100
   end
 
   def benchmark_speed
-
+    puts @client
   end
 
   def reset_client

@@ -78,7 +78,6 @@ class RealtimeCoBenchmarker
     @benchmarks.inject(0) { |memo, obj| memo += obj[:latency] } / @benchmarks.length
   end
 
-
   def benchmark_reliability
     while (!ready)
       sleep(1)
@@ -100,7 +99,7 @@ class RealtimeCoBenchmarker
   end
 
   def benchmark_speed
-
+    puts @client
   end
 
   def reset_client

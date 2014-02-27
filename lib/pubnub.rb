@@ -13,7 +13,6 @@ class PubnubBenchmarker
   end
 
   def connect
-    puts "Connecting"
     @client = Pubnub.new(
         :subscribe_key    => 'sub-c-170fcba8-9973-11e3-8d39-02ee2ddab7fe',
         :publish_key      => 'pub-c-28b03a80-5f93-4d3c-a431-e08e20e7e446',
@@ -39,7 +38,6 @@ class PubnubBenchmarker
   end
 
   def subscribe
-    puts "Subscribing"
     @client.subscribe(
         :channel  => @channel,
         :callback => lambda { |data|

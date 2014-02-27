@@ -38,8 +38,8 @@ class PusherBenchmarker
   end
 
   def subscribe
-    @client[@channel].bind('pusher:subscription_succeeded') do |data|
-    end
+    # @client[@channel].bind('pusher:subscription_succeeded') do |data|
+    # end
     @client.subscribe(@channel)
     @subscribed = true
     @client[@channel].bind('benchmark') do |data|

@@ -35,10 +35,18 @@ class BenchmarkAnalysis < Sinatra::Base
   configure do
     scheduler = Rufus::Scheduler.new
     set :scheduler, scheduler
-    scheduler.every('5m') do
-      puts "Running tests"
-      runner = ServicesRunner.new "tester"
-      runner.run_benchmarks
+    if ENV['MONGOHQ_URL']
+      scheduler.every('5m') do
+        puts "Running tests"
+        runner = ServicesRunner.new "tester"
+        runner.run_benchmarks
+      end
+    else
+      scheduler.every('1m') do
+        puts "Running tests"
+        runner = ServicesRunner.new "tester"
+        runner.run_benchmarks
+      end
     end
   end
 
@@ -121,7 +129,7 @@ class BenchmarkAnalysis < Sinatra::Base
 
     def reliability_data_for service, colour, data
       service_data = data.select { |entry| entry['service'] == service }
-      reliability = service_data.inject(0) { |memo, obj| memo += obj['reliability'] } / service_data.length
+      reliability = service_data.inject(0) { |memo, obj| memo += obj['reliability'] } / service_data.length if !service_data.empty?
 
       { service: service, reliability: reliability, color: colour }.to_json
     end

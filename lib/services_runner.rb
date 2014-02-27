@@ -15,18 +15,21 @@ class ServicesRunner
     sleep 2
     @realtime_co = RealtimeCoBenchmarker.new channel
     @services += [@pusher, @pubnub, @realtime_co]
-    puts @services.inspect
   end
 
   def benchmark_latencies 
-    puts @services.inspect
-    @services.each { |service| service.benchmark_latency }
+    @services.each do |service| 
+      service.benchmark_latency
+      sleep 2
+    end
     sleep 2
   end
 
   def benchmark_reliabilities
-    puts @services.inspect
-    @services.each { |service| service.benchmark_reliability }
+    @services.each do |service| 
+      service.benchmark_reliability
+      sleep 2
+    end
     sleep 2
   end
 

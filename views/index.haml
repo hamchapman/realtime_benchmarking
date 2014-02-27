@@ -104,7 +104,7 @@
                     });
           }
         });
-        
+
         $.ajax({
           type: 'POST',
           url: '/new_reliability_data',
@@ -184,7 +184,11 @@
       // $(".realtimeco-reliability-score").css( "color", realtimecoReliability["color"] );
       // $(".realtimeco-title").css( "color", realtimecoReliability["color"] );
 
+      var pusher = new Pusher( 'a8536d1bddd6f5951242' );
+      var mongoUpdateChannel = pusher.subscribe( 'mongo' );
+
       mongoUpdateChannel.bind( 'reliabilities-update', function( message ) {
+        var current_timeframe = $(".current-timeframe").attr("data-timeframe");
         $.ajax({
           type: 'POST',
           url: '/new_reliability_data',
@@ -204,8 +208,6 @@
       });
 
 
-      var pusher = new Pusher( 'a8536d1bddd6f5951242' );
-      var mongoUpdateChannel = pusher.subscribe( 'mongo' );
       mongoUpdateChannel.bind( 'latencies-update', function( message ) {
         var current_timeframe = $(".current-timeframe").attr("data-timeframe");
         $.ajax({

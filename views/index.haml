@@ -51,7 +51,7 @@
         $(".current-timeframe").attr("data-timeframe", time_data);
         $.ajax({
           type: 'POST',
-          url: '/new_data',
+          url: '/new_latency_data',
           data: { since: time_data },
           success: function (response) {
                     console.log(response);
@@ -104,6 +104,23 @@
                     });
           }
         });
+        
+        $.ajax({
+          type: 'POST',
+          url: '/new_reliability_data',
+          data: { since: current_timeframe },
+          success: function (response) {
+            var updatedData = response;
+
+            var pusherReliability = JSON.parse(updatedData[0]);
+            var pubnubReliability = JSON.parse(updatedData[1]);
+            var realtimecoReliability = JSON.parse(updatedData[2]);
+
+            $(".pusher-reliability-score").text(pusherReliability["reliability"] + "%")
+            $(".pubnub-reliability-score").text(pubnubReliability["reliability"] + "%")
+            $(".realtimeco-reliability-score").text(realtimecoReliability["reliability"] + "%")
+          }
+        });
       });
 
       nv.addGraph(function() {
@@ -154,18 +171,37 @@
 
       var pusherReliability = #{@pusher_reliability};
       $(".pusher-reliability-score").text(pusherReliability["reliability"] + "%")
-      $(".pusher-reliability-score").css( "color", pusherReliability["color"] );
-      $(".pusher-title").css( "color", pusherReliability["color"] );
+      // $(".pusher-reliability-score").css( "color", pusherReliability["color"] );
+      // $(".pusher-title").css( "color", pusherReliability["color"] );
 
       var pubnubReliability = #{@pubnub_reliability};
       $(".pubnub-reliability-score").text(pubnubReliability["reliability"] + "%")
-      $(".pubnub-reliability-score").css( "color", pubnubReliability["color"] );
-      $(".pubnub-title").css( "color", pubnubReliability["color"] );
+      // $(".pubnub-reliability-score").css( "color", pubnubReliability["color"] );
+      // $(".pubnub-title").css( "color", pubnubReliability["color"] );
 
       var realtimecoReliability = #{@realtime_co_reliability};
       $(".realtimeco-reliability-score").text(realtimecoReliability["reliability"] + "%")
-      $(".realtimeco-reliability-score").css( "color", realtimecoReliability["color"] );
-      $(".realtimeco-title").css( "color", realtimecoReliability["color"] );
+      // $(".realtimeco-reliability-score").css( "color", realtimecoReliability["color"] );
+      // $(".realtimeco-title").css( "color", realtimecoReliability["color"] );
+
+      mongoUpdateChannel.bind( 'reliabilities-update', function( message ) {
+        $.ajax({
+          type: 'POST',
+          url: '/new_reliability_data',
+          data: { since: current_timeframe },
+          success: function (response) {
+            var updatedData = response;
+
+            var pusherReliability = JSON.parse(updatedData[0]);
+            var pubnubReliability = JSON.parse(updatedData[1]);
+            var realtimecoReliability = JSON.parse(updatedData[2]);
+
+            $(".pusher-reliability-score").text(pusherReliability["reliability"] + "%")
+            $(".pubnub-reliability-score").text(pubnubReliability["reliability"] + "%")
+            $(".realtimeco-reliability-score").text(realtimecoReliability["reliability"] + "%")
+          }
+        });      
+      });
 
 
       var pusher = new Pusher( 'a8536d1bddd6f5951242' );
@@ -174,7 +210,7 @@
         var current_timeframe = $(".current-timeframe").attr("data-timeframe");
         $.ajax({
           type: 'POST',
-          url: '/new_data',
+          url: '/new_latency_data',
           data: { since: current_timeframe },
           success: function (response) {
                     console.log(response);
@@ -234,4 +270,3 @@
       #chart svg {
         height: 500px;
       }
-

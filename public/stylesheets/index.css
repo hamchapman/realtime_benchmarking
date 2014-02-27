@@ -2,7 +2,9 @@ body {
   font-family: 'Open Sans', sans-serif;
 }
 
-textarea, input { outline: none; }
+textarea, input { 
+  outline: none; 
+}
 
 .service-reliability {
   float: left;
@@ -74,8 +76,13 @@ input[type=text] {
   font-size: 0.8em;
 }
 
-input:focus::-webkit-input-placeholder { color:transparent; }
-input:focus:-moz-placeholder { color:transparent; }
+input:focus::-webkit-input-placeholder { 
+  color:transparent; 
+}
+
+input:focus:-moz-placeholder { 
+  color:transparent; 
+}
 
 input[type=text]:focus {
   border-color:#d80114; 
@@ -90,4 +97,28 @@ input[type=submit] {
   background: #d80114;
   color: white;
   font-size: 0.7em;
+}
+
+.pusher-reliability-score {
+  color: '#ff7f0e';
+}
+
+.pubnub-reliability-score {
+  color: '#3c9fad';
+}
+
+.realtimeco-reliability-score {
+  color: '#ad007b';
+}
+
+.pusher-title {
+  color: '#ff7f0e';
+}
+
+.pubnub-title {
+  color: '#3c9fad';
+}
+
+.realtimeco-title {
+  color: '#ad007b';
 }

@@ -29,7 +29,7 @@ class BenchmarkAnalysis < Sinatra::Base
     set :mongo_db, db_connection
   else
     conn = MongoClient.new("localhost", 27017)
-    set :mongo_db, conn.db('test')
+    set :mongo_db, conn.db('realtime_benchmarks')
   end
     
   configure do
@@ -46,16 +46,17 @@ class BenchmarkAnalysis < Sinatra::Base
   Pusher.key = 'a8536d1bddd6f5951242'
   Pusher.secret = '0c80607ae8d716a716bb'
 
-  $latencies_coll =  mongo_db['competitor_benchmarks']['latencies']
-  $reliabilities_coll =  mongo_db['competitor_benchmarks']['reliabilities']
+  $latencies_coll =  mongo_db['realtime_benchmarks']['latencies']
+  $reliabilities_coll =  mongo_db['realtime_benchmarks']['reliabilities']
+  $speeds_coll =  mongo_db['realtime_benchmarks']['speeds']
 
   get '/' do 
-    latency_data = settings.mongo_db['competitor_benchmarks']['latencies'].find({}, sort: ["time", 1]).to_a
+    latency_data = settings.mongo_db['realtime_benchmarks']['latencies'].find({}, sort: ["time", 1]).to_a
     @pusher_latency = latency_data_for 'pusher', @@pusher_colour, latency_data
     @pubnub_latency = latency_data_for 'pubnub', @@pubnub_colour, latency_data
     @realtime_co_latency = latency_data_for 'realtime_co', @@realtime_co_colour, latency_data
 
-    reliability_data = settings.mongo_db['competitor_benchmarks']['reliabilities'].find({}, sort: ["time", 1]).to_a
+    reliability_data = settings.mongo_db['realtime_benchmarks']['reliabilities'].find({}, sort: ["time", 1]).to_a
     @pusher_reliability = reliability_data_for 'pusher', @@pusher_colour, reliability_data
     @pubnub_reliability = reliability_data_for 'pubnub', @@pubnub_colour, reliability_data
     @realtime_co_reliability = reliability_data_for 'realtime_co', @@realtime_co_colour, reliability_data
@@ -63,20 +64,41 @@ class BenchmarkAnalysis < Sinatra::Base
     haml :index
   end
 
-  post '/new_data' do
+  post '/new_latency_data' do
     content_type :json
     since_time = Chronic.parse(params["since"])
     if since_time
-      latency_data = settings.mongo_db['competitor_benchmarks']['latencies'].find({ time: { "$gt" => since_time } }, sort: ["time", 1]).to_a
+      latency_data = settings.mongo_db['realtime_benchmarks']['latencies'].find({ time: { "$gt" => since_time } }, sort: ["time", 1]).to_a
     else
-      latency_data = settings.mongo_db['competitor_benchmarks']['latencies'].find({ time: { "$gt" => Time.now - 7*24*60*60 } }, sort: ["time", 1]).to_a
+      latency_data = settings.mongo_db['realtime_benchmarks']['latencies'].find({ time: { "$gt" => Time.now - 7*24*60*60 } }, sort: ["time", 1]).to_a
     end
-    @pusher_updated_latency = latency_data_for 'pusher', @@pusher_colour, latency_data
-    @pubnub_updated_latency = latency_data_for 'pubnub', @@pubnub_colour, latency_data
-    @realtime_co_updated_latency = latency_data_for 'realtime_co', @@realtime_co_colour, latency_data
-    combined_data = [@pusher_updated_latency, @pubnub_updated_latency, @realtime_co_updated_latency].to_json
+    pusher_updated_latency = latency_data_for 'pusher', @@pusher_colour, latency_data
+    pubnub_updated_latency = latency_data_for 'pubnub', @@pubnub_colour, latency_data
+    realtime_co_updated_latency = latency_data_for 'realtime_co', @@realtime_co_colour, latency_data
+    combined_data = [pusher_updated_latency, pubnub_updated_latency, realtime_co_updated_latency].to_json
   end
-  
+
+  post '/new_reliability_data' do
+    content_type :json
+    since_time = Chronic.parse(params["since"])
+    if since_time
+      reliability_data = settings.mongo_db['realtime_benchmarks']['reliabilities'].find({ time: { "$gt" => since_time } }, sort: ["time", 1]).to_a
+    else
+      reliability_data = settings.mongo_db['realtime_benchmarks']['reliabilities'].find({ time: { "$gt" => Time.now - 7*24*60*60 } }, sort: ["time", 1]).to_a
+    end
+    combined_data = seperated_realiability_data(reliability_data).to_json
+  end
+
+  # post '/new_speed_data' do
+  #   content_type :json
+  #   since_time = Chronic.parse(params["since"])
+  #   if since_time
+  #     speed_data = settings.mongo_db['realtime_benchmarks']['speeds'].find({ time: { "$gt" => since_time } }, sort: ["time", 1]).to_a
+  #   else
+  #     speed_data = settings.mongo_db['realtime_benchmarks']['speeds'].find({ time: { "$gt" => Time.now - 7*24*60*60 } }, sort: ["time", 1]).to_a
+  #   end
+  #   combined_data = seperated_speed_data(speed_data).to_json
+  # end
 
   post '/pusher/auth' do
     response = Pusher[params[:channel_name]].authenticate(params[:socket_id])
@@ -102,6 +124,13 @@ class BenchmarkAnalysis < Sinatra::Base
       reliability = service_data.inject(0) { |memo, obj| memo += obj['reliability'] } / service_data.length
 
       { service: service, reliability: reliability, color: colour }.to_json
+    end
+
+    def seperated_realiability_data reliability_data
+      pusher_reliability = reliability_data_for 'pusher', @@pusher_colour, reliability_data
+      pubnub_reliability = reliability_data_for 'pubnub', @@pubnub_colour, reliability_data
+      realtime_co_reliability = reliability_data_for 'realtime_co', @@realtime_co_colour, reliability_data
+      [pusher_reliability, pubnub_reliability, realtime_co_reliability]
     end
   end
 

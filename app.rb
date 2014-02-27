@@ -19,8 +19,6 @@ class BenchmarkAnalysis < Sinatra::Base
   @@realtime_co_colour = '#ad007b'
 
   include Mongo
-  
-  # SOMETHING LIKE THIS TO SETUP HEROKU / LOCALLY 
 
   if ENV['MONGOHQ_URL']
     db = URI.parse(ENV['MONGOHQ_URL'])
@@ -37,29 +35,12 @@ class BenchmarkAnalysis < Sinatra::Base
   configure do
     scheduler = Rufus::Scheduler.new
     set :scheduler, scheduler
-    scheduler.every('1m') do
+    scheduler.every('5m') do
       puts "Running tests"
       runner = ServicesRunner.new "tester"
       runner.run_benchmarks
     end
   end
-
-  # configure do
-  #   conn = MongoClient.new("localhost", 27017)
-  #   # set :mongo_connection, conn
-  #   set :mongo_db, conn.db('test')
-
-  #   $latencies_coll =  mongo_db['competitor_benchmarks']['latencies']
-  #   $reliabilities_coll =  mongo_db['competitor_benchmarks']['reliabilities']
-    
-  #   scheduler = Rufus::Scheduler.new
-  #   set :scheduler, scheduler
-  #   scheduler.every('1m') do
-  #     puts "Running tests"
-  #     runner = ServicesRunner.new "tester"
-  #     runner.run_benchmarks
-  #   end
-  # end
 
   Pusher.app_id = '66498'
   Pusher.key = 'a8536d1bddd6f5951242'
@@ -121,15 +102,6 @@ class BenchmarkAnalysis < Sinatra::Base
       reliability = service_data.inject(0) { |memo, obj| memo += obj['reliability'] } / service_data.length
 
       { service: service, reliability: reliability, color: colour }.to_json
-    end
-
-    def get_connection
-      # return mongo_db if mongo_db
-      db = URI.parse(ENV['MONGOHQ_URL'])
-      db_name = db.path.gsub(/^\//, '')
-      db_connection = Mongo::Connection.new(db.host, db.port).db(db_name)
-      db_connection.authenticate(db.user, db.password) unless (db.user.nil? || db.user.nil?)
-      db_connection
     end
   end
 

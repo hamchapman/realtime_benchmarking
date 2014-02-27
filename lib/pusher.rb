@@ -45,8 +45,8 @@ class PusherBenchmarker
       # puts latency
       puts data.inspect
       @benchmarks << { service: "pusher", time: Time.now, latency: latency }
-      puts "I'm inside the subscribe method where I'm adding things to @benchmarks"
-      puts @benchmarks.inspect
+      # puts "I'm inside the subscribe method where I'm adding things to @benchmarks"
+      # puts @benchmarks.inspect
     end
   end
 
@@ -70,7 +70,7 @@ class PusherBenchmarker
     sleep 2.0
     $latencies_coll.insert( { service: "pusher", time: Time.now, latency: average_latency } )
     Pusher.trigger('mongo', 'latencies-update', 'Mongo updated')
-    puts @benchmarks.inspect
+    # puts @benchmarks.inspect
     @benchmarks = []
   end
 
@@ -91,10 +91,20 @@ class PusherBenchmarker
       sleep 0.2
     end
     sleep 2.0
+    puts "**********************************************************************"
+    puts "**********************************************************************"
+    puts "RELIABILITY PERCENTAGE"
+    puts calculate_reliability_percentage
+    puts "**********************************************************************"
+    puts "**********************************************************************"
+    puts "@benchmarks looks like this:"
+    puts @benchmarks.inspect
+    puts "**********************************************************************"
+    puts "**********************************************************************"
     $reliabilities_coll.insert( { service: "pusher", time: Time.now, reliability: calculate_reliability_percentage } )
     Pusher.trigger('mongo', 'reliabilities-update', 'Mongo updated')
     @benchmarks = []
-    puts @benchmarks.inspect
+    # puts @benchmarks.inspect
     reset_client
   end
 

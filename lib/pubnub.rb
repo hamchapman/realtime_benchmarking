@@ -91,7 +91,7 @@ class PubnubBenchmarker
   end
 
   def calculate_reliability_percentage
-    (@benchmarks.length / 20) * 100
+    (@benchmarks.length / 20.0) * 100
   end
 
   def benchmark_speed

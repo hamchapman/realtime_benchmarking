@@ -22,7 +22,7 @@ class ServicesRunner
       service.benchmark_latency
       sleep 2
     end
-    sleep 2
+    sleep 3
   end
 
   def benchmark_reliabilities
@@ -30,7 +30,7 @@ class ServicesRunner
       service.benchmark_reliability
       sleep 2
     end
-    sleep 2
+    sleep 3
   end
 
   def benchmark_speeds

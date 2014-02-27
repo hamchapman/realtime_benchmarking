@@ -36,8 +36,6 @@ class PusherBenchmarker
   end
 
   def subscribe
-    # @client[@channel].bind('pusher:subscription_succeeded') do |data|
-    # end
     @client.subscribe(@channel)
     @subscribed = true
     @client[@channel].bind('benchmark') do |data|
@@ -47,6 +45,8 @@ class PusherBenchmarker
       # puts latency
       puts data.inspect
       @benchmarks << { service: "pusher", time: Time.now, latency: latency }
+      puts "I'm inside the subscribe method where I'm adding things to @benchmarks"
+      puts @benchmarks.inspect
     end
   end
 
@@ -65,6 +65,7 @@ class PusherBenchmarker
     end
     (1..20).each do |num|
       send({time: Time.now, id: num})
+      sleep 0.2
     end
     sleep 2.0
     $latencies_coll.insert( { service: "pusher", time: Time.now, latency: average_latency } )
@@ -79,12 +80,15 @@ class PusherBenchmarker
 
 
   def benchmark_reliability
+    puts "**********************************************************************"
+    puts "**********************************************************************"
+    puts "HERE COMES PUSHER RELIABILITY BENCHMARKS"
     while (!ready)
       sleep(1)
     end
-    @ready_for_next_tests = false
     (1..20).each do |num|
       send({time: Time.now, id: num})
+      sleep 0.2
     end
     sleep 2.0
     $reliabilities_coll.insert( { service: "pusher", time: Time.now, reliability: calculate_reliability_percentage } )
@@ -95,6 +99,8 @@ class PusherBenchmarker
   end
 
   def calculate_reliability_percentage
+    puts "I'm inside the reliability percentage calculation"
+    puts @benchmarks.inspect
     (@benchmarks.length / 20) * 100
   end
 

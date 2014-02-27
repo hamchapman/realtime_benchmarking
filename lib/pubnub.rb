@@ -78,7 +78,6 @@ class PubnubBenchmarker
     while (!ready)
       sleep(1)
     end
-    @ready_for_next_tests = false
     (1..20).each do |num|
       send({time: Time.now, id: num})
       sleep 0.2

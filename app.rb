@@ -23,7 +23,12 @@ class BenchmarkAnalysis < Sinatra::Base
   # SOMETHING LIKE THIS TO SETUP HEROKU / LOCALLY 
 
   if ENV['MONGOHQ_URL']
-    set :mongo_db, get_connection
+    db = URI.parse(ENV['MONGOHQ_URL'])
+    db_name = db.path.gsub(/^\//, '')
+    db_connection = Mongo::Connection.new(db.host, db.port).db(db_name)
+    db_connection.authenticate(db.user, db.password) unless (db.user.nil? || db.user.nil?)
+    db_connection
+    set :mongo_db, db_connection
   else
     conn = MongoClient.new("localhost", 27017)
     set :mongo_db, conn.db('test')

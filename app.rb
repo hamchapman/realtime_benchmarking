@@ -38,13 +38,13 @@ class BenchmarkAnalysis < Sinatra::Base
     if ENV['MONGOHQ_URL']
       scheduler.every('5m') do
         puts "Running tests"
-        runner = ServicesRunner.new "tester"
+        runner = ServicesRunner.new "heroku_tester"
         runner.run_benchmarks
       end
     else
       scheduler.every('1m') do
         puts "Running tests"
-        runner = ServicesRunner.new "tester"
+        runner = ServicesRunner.new "local_tester"
         runner.run_benchmarks
       end
     end

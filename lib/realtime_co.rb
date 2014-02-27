@@ -45,13 +45,12 @@ class RealtimeCoBenchmarker
 
   def subscribe
     @client.subscribe(@channel, true) do |sender, channel, message| 
-      puts message.inspect
       message = JSON.parse(message)
       sent = (Time.parse(message["time"])).to_f
       received = Time.now.to_f
       latency = (received - sent) * 1000
+      # puts latency
       puts message.inspect
-      puts latency
       @benchmarks << { service: "realtime_co", time: Time.now, latency: latency }
     end
   end
@@ -71,11 +70,11 @@ class RealtimeCoBenchmarker
     sleep 2.0
     $latencies_coll.insert( { service: "realtime_co", time: Time.now, latency: average_latency } )
     Pusher.trigger('mongo', 'latencies-update', 'Mongo updated')
+    puts @benchmarks.inspect
     @benchmarks = []
   end
 
   def average_latency
-    puts @benchmarks.inspect
     @benchmarks.inject(0) { |memo, obj| memo += obj[:latency] } / @benchmarks.length
   end
 
@@ -92,6 +91,7 @@ class RealtimeCoBenchmarker
     sleep 2.0
     $reliabilities_coll.insert( { service: "realtime_co", time: Time.now, reliability: calculate_reliability_percentage } )
     Pusher.trigger('mongo', 'reliabilities-update', 'Mongo updated')
+    puts @benchmarks.inspect
     @benchmarks = []
     reset_client
   end

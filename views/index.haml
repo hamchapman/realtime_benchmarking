@@ -104,11 +104,11 @@
                     });
           }
         });
-
+        
         $.ajax({
           type: 'POST',
           url: '/new_reliability_data',
-          data: { since: current_timeframe },
+          data: { since: time_data },
           success: function (response) {
             var updatedData = response;
 

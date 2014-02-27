@@ -44,8 +44,8 @@ class PubnubBenchmarker
           sent = (Time.parse(data.message["time"])).to_f
           received = Time.now.to_f
           latency = (received - sent) * 1000
+          # puts latency
           puts data.message.inspect
-          puts latency
           @benchmarks << { service: "pubnub", time: Time.now, latency: latency }
        }
     )
@@ -66,11 +66,11 @@ class PubnubBenchmarker
     sleep 2.0
     $latencies_coll.insert( { service: "pubnub", time: Time.now, latency: average_latency } )
     Pusher.trigger('mongo', 'latencies-update', 'Mongo updated')
+    puts @benchmarks.inspect
     @benchmarks = []
   end
 
   def average_latency
-    puts @benchmarks.inspect
     @benchmarks.inject(0) { |memo, obj| memo += obj[:latency] } / @benchmarks.length
   end
 
@@ -86,6 +86,7 @@ class PubnubBenchmarker
     sleep 2.0
     $reliabilities_coll.insert( { service: "pubnub", time: Time.now, reliability: calculate_reliability_percentage } )
     Pusher.trigger('mongo', 'reliabilities-update', 'Mongo updated')
+    puts @benchmarks.inspect
     @benchmarks = []
     reset_client
   end

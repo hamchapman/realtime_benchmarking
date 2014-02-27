@@ -13,12 +13,10 @@ class PusherBenchmarker
     @ready = false
 
     @client.bind("pusher:connection_established") do |data|
-      puts "Connected"
       subscribe      
     end
 
     @client.bind('pusher_internal:subscription_succeeded') do |data|
-      puts "Subscribed"
       @ready = true  
     end
 
@@ -46,7 +44,7 @@ class PusherBenchmarker
       sent = Time.parse(JSON.parse(data)["time"]).to_f
       received = Time.now.to_f
       latency = (received - sent) * 1000
-      puts latency
+      # puts latency
       puts data.inspect
       @benchmarks << { service: "pusher", time: Time.now, latency: latency }
     end
@@ -71,11 +69,11 @@ class PusherBenchmarker
     sleep 2.0
     $latencies_coll.insert( { service: "pusher", time: Time.now, latency: average_latency } )
     Pusher.trigger('mongo', 'latencies-update', 'Mongo updated')
+    puts @benchmarks.inspect
     @benchmarks = []
   end
 
   def average_latency
-    puts @benchmarks.inspect
     @benchmarks.inject(0) { |memo, obj| memo += obj[:latency] } / @benchmarks.length
   end
 
@@ -92,6 +90,7 @@ class PusherBenchmarker
     $reliabilities_coll.insert( { service: "pusher", time: Time.now, reliability: calculate_reliability_percentage } )
     Pusher.trigger('mongo', 'reliabilities-update', 'Mongo updated')
     @benchmarks = []
+    puts @benchmarks.inspect
     reset_client
   end
 

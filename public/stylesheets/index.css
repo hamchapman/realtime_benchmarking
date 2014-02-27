@@ -100,25 +100,25 @@ input[type=submit] {
 }
 
 .pusher-reliability-score {
-  color: '#ff7f0e';
+  color: #ff7f0e;
 }
 
 .pubnub-reliability-score {
-  color: '#3c9fad';
+  color: #3c9fad;
 }
 
 .realtimeco-reliability-score {
-  color: '#ad007b';
+  color: #ad007b;
 }
 
 .pusher-title {
-  color: '#ff7f0e';
+  color: #ff7f0e;
 }
 
 .pubnub-title {
-  color: '#3c9fad';
+  color: #3c9fad;
 }
 
 .realtimeco-title {
-  color: '#ad007b';
+  color: #ad007b;
 }

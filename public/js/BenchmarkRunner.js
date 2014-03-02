@@ -99,11 +99,26 @@ BenchmarkRunner.prototype._nextTest = function() {
   this._service = this._getNextService();
   if( this._service === null ) {
     this.onLog( 'ALL SERVICES TESTED' );
+    var combinedResults = {};
     for( var service in this._serviceLatencyResults ) {
-        var result = this._serviceLatencyResults[ service ];
+        var result = this._serviceLatencyResults[service];
+        combinedResults[service] = BenchmarkRunner.getAverage(result);
         this.onLog( 'RESULT for ' + service + ': ' + result.join( '\t' ) +
                  '\t(Average: ' + BenchmarkRunner.getAverage( result ) + 'ms)' );
     }
+    
+    console.log(combinedResults);
+
+    $.ajax({
+          type: 'POST',
+          url: 'http://0.0.0.0:9292/test',
+          data: { latencies: combinedResults },
+          success: function (response) {
+                    console.log(combinedResults);
+                    console.log("AJAXING TO TEST");
+          }
+
+    });
 
     if( this._options.completed ) {
       this._options.completed( this._serviceLatencyResults );

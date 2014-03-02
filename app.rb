@@ -21,6 +21,7 @@ class BenchmarkAnalysis < Sinatra::Base
   include Mongo
 
   if ENV['MONGOHQ_URL']
+    require 'newrelic_rpm'
     db = URI.parse(ENV['MONGOHQ_URL'])
     db_name = db.path.gsub(/^\//, '')
     db_connection = Mongo::Connection.new(db.host, db.port).db(db_name)
@@ -32,23 +33,23 @@ class BenchmarkAnalysis < Sinatra::Base
     set :mongo_db, conn.db('realtime_benchmarks')
   end
     
-  configure do
-    scheduler = Rufus::Scheduler.new
-    set :scheduler, scheduler
-    if ENV['MONGOHQ_URL']
-      scheduler.every('5m') do
-        puts "Running tests"
-        runner = ServicesRunner.new "heroku_tester"
-        runner.run_benchmarks
-      end
-    else
-      scheduler.every('1m') do
-        puts "Running tests"
-        runner = ServicesRunner.new "local_tester"
-        runner.run_benchmarks
-      end
-    end
-  end
+  # configure do
+  #   scheduler = Rufus::Scheduler.new
+  #   set :scheduler, scheduler
+  #   if ENV['MONGOHQ_URL']
+  #     scheduler.every('5m') do
+  #       puts "Running tests"
+  #       runner = ServicesRunner.new "heroku_tester"
+  #       runner.run_benchmarks
+  #     end
+  #   else
+  #     scheduler.every('1m') do
+  #       puts "Running tests"
+  #       runner = ServicesRunner.new "local_tester"
+  #       runner.run_benchmarks
+  #     end
+  #   end
+  # end
 
   Pusher.app_id = '66498'
   Pusher.key = 'a8536d1bddd6f5951242'
@@ -107,6 +108,15 @@ class BenchmarkAnalysis < Sinatra::Base
   #   end
   #   combined_data = seperated_speed_data(speed_data).to_json
   # end
+
+  get '/js_latencies' do
+    haml :js_latencies
+  end
+
+  post '/test' do
+    content_type :json
+    puts params["latencies"].inspect
+  end
 
   post '/pusher/auth' do
     response = Pusher[params[:channel_name]].authenticate(params[:socket_id])

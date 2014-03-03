@@ -271,18 +271,12 @@
           var dataPoints = individualServiceData["values"];
           dataPoints.forEach(function(point) {
           var yValue = point["y"];
-          console.log(yValue);
             if (parseFloat(yValue) > serviceWideMaxY) {
-              console.log("And this is a bigger one");
-              console.log(yValue);
               serviceWideMaxY = parseFloat(yValue);
             }
           })
         });
         
-        console.log("Here is the biggest");
-        console.log(serviceWideMaxY);
-
         var chart = nv.models.lineChart()
           .margin({left: 100, bottom: 120})  
           .useInteractiveGuideline(true)  
@@ -416,10 +410,11 @@
 
                     updatedData.forEach(function(individualServiceData) {
                       var dataPoints = individualServiceData["values"];
+                      console
                       dataPoints.forEach(function(point) {
                       var yValue = point["y"];
-                        if (yValue > serviceWideMaxY) {
-                          serviceWideMaxY = yValue;
+                        if (parseFloat(yValue) > serviceWideMaxY) {
+                          serviceWideMaxY = parseFloat(yValue);
                         }
                       })
                     });

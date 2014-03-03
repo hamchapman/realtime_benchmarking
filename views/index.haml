@@ -402,6 +402,20 @@
           success: function (response) {
                     console.log(response);
                     var updatedData = response;
+
+                    var serviceWideMaxY = 0;
+
+                    // Calculate maximum y value in JS latency data
+
+                    serviceJSData.forEach(function(updatedData) {
+                      var dataPoints = updatedData["values"];
+                      dataPoints.forEach(function(point) {
+                      var yValue = point["y"];
+                        if (yValue > serviceWideMaxY) {
+                          serviceWideMaxY = yValue;
+                        }
+                      })
+                    });
                     
                     nv.addGraph(function() {
                       var chart = nv.models.lineChart()
@@ -411,7 +425,7 @@
                         .showLegend(true)       
                         .showYAxis(true)        
                         .showXAxis(true)
-                        .forceY(0);
+                        .forceY([0, serviceWideMaxY]);
                       
                       chart.xAxis 
                         .rotateLabels(-45)

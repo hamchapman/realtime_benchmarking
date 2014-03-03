@@ -58,6 +58,7 @@ class BenchmarkAnalysis < Sinatra::Base
   $latencies_coll =  mongo_db['realtime_benchmarks']['latencies']
   $reliabilities_coll =  mongo_db['realtime_benchmarks']['reliabilities']
   $speeds_coll =  mongo_db['realtime_benchmarks']['speeds']
+  $js_latencies_coll = mongo_db['realtime_benchmarks']['js_latencies']
 
   get '/' do 
     latency_data = settings.mongo_db['realtime_benchmarks']['latencies'].find({}, sort: ["time", 1]).to_a
@@ -81,10 +82,7 @@ class BenchmarkAnalysis < Sinatra::Base
     else
       latency_data = settings.mongo_db['realtime_benchmarks']['latencies'].find({ time: { "$gt" => Time.now - 7*24*60*60 } }, sort: ["time", 1]).to_a
     end
-    pusher_updated_latency = latency_data_for 'pusher', @@pusher_colour, latency_data
-    pubnub_updated_latency = latency_data_for 'pubnub', @@pubnub_colour, latency_data
-    realtime_co_updated_latency = latency_data_for 'realtime_co', @@realtime_co_colour, latency_data
-    combined_data = [pusher_updated_latency, pubnub_updated_latency, realtime_co_updated_latency].to_json
+    combined_data = separated_latency_data(latency_data).to_json
   end
 
   post '/new_reliability_data' do
@@ -115,7 +113,9 @@ class BenchmarkAnalysis < Sinatra::Base
 
   post '/test' do
     content_type :json
-    puts params["latencies"].inspect
+    latencies = params["latencies"]
+    save_latencies_to_db latencies
+    Pusher.trigger('mongo', 'js-latencies-update', 'Mongo updated')
   end
 
   post '/pusher/auth' do
@@ -149,6 +149,19 @@ class BenchmarkAnalysis < Sinatra::Base
       pubnub_reliability = reliability_data_for 'pubnub', @@pubnub_colour, reliability_data
       realtime_co_reliability = reliability_data_for 'realtime_co', @@realtime_co_colour, reliability_data
       [pusher_reliability, pubnub_reliability, realtime_co_reliability]
+    end
+
+    def separated_latency_data latency_data
+      pusher_latency = latency_data_for 'pusher', @@pusher_colour, latency_data
+      pubnub_latency = latency_data_for 'pubnub', @@pubnub_colour, latency_data
+      realtime_co_latency = latency_data_for 'realtime_co', @@realtime_co_colour, latency_data
+      [pusher_latency, pubnub_latency, realtime_co_latency]
+    end
+
+    def save_latencies_to_db latencies
+      latencies.each do |service, latency|
+        $js_latencies_coll.insert( { service: service, time: Time.now, latency: latency } )
+      end
     end
   end
 

@@ -107,15 +107,13 @@ BenchmarkRunner.prototype._nextTest = function() {
                  '\t(Average: ' + BenchmarkRunner.getAverage( result ) + 'ms)' );
     }
     
-    console.log(combinedResults);
-
     $.ajax({
           type: 'POST',
           url: 'http://0.0.0.0:9292/test',
           data: { latencies: combinedResults },
           success: function (response) {
                     console.log(combinedResults);
-                    console.log("AJAXING TO TEST");
+                    console.log("Success");
           }
 
     });

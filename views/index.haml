@@ -408,8 +408,8 @@
 
                     // Calculate maximum y value in JS latency data
 
-                    serviceJSData.forEach(function(updatedData) {
-                      var dataPoints = updatedData["values"];
+                    updatedData.forEach(function(individualServiceData) {
+                      var dataPoints = individualServiceData["values"];
                       dataPoints.forEach(function(point) {
                       var yValue = point["y"];
                         if (yValue > serviceWideMaxY) {

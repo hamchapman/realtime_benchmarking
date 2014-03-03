@@ -109,7 +109,7 @@ BenchmarkRunner.prototype._nextTest = function() {
     
     $.ajax({
           type: 'POST',
-          url: 'http://0.0.0.0:9292/test',
+          url: 'http://realtime-benchmarking/test',
           data: { latencies: combinedResults },
           success: function (response) {
                     console.log(combinedResults);

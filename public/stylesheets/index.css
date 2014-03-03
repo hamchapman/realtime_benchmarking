@@ -122,3 +122,11 @@ input[type=submit] {
 .realtimeco-title {
   color: #ad007b;
 }
+
+#chart_latency svg {
+  height: 500px;
+}
+
+#chart_js_latency svg {
+  height: 500px;
+}

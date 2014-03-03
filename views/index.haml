@@ -106,6 +106,68 @@
                     });
           }
         });
+
+        $.ajax({
+          type: 'POST',
+          url: '/new_js_latency_data',
+          data: { since: time_data },
+          success: function (response) {
+                    console.log(response);
+                    var updatedData = response;
+                    
+                    nv.addGraph(function() {
+                      var chart = nv.models.lineChart()
+                        .margin({left: 100, bottom: 100})  
+                        .useInteractiveGuideline(true)  
+                        .transitionDuration(350)  
+                        .showLegend(true)       
+                        .showYAxis(true)        
+                        .showXAxis(true)
+                        .forceY(0);
+                      
+                      chart.xAxis 
+                        .rotateLabels(-45)
+                        .tickFormat(function(d) { return d3.time.format('%d-%m-%Y %H:%M:%S')(new Date(d)) });
+                       
+                      chart.yAxis
+                        .axisLabel('Latency (ms)')
+                        .tickFormat(d3.format('.0f'));
+    
+                      var pusherData = JSON.parse(updatedData[0]);
+                      var pubnubData = JSON.parse(updatedData[1]);
+                      var realtimecoData = JSON.parse(updatedData[2]);
+                      var firebaseData = JSON.parse(updatedData[3]);
+                      var goinstantData = JSON.parse(updatedData[4]);
+
+                      // Make the dates easy for d3 to work with
+                      pusherData["values"].forEach(function(hash) {
+                        hash["x"] = new Date(hash["x"]);
+                      });
+                      pubnubData["values"].forEach(function(hash) {
+                        hash["x"] = new Date(hash["x"]);
+                      });
+                      realtimecoData["values"].forEach(function(hash) {
+                        hash["x"] = new Date(hash["x"]);
+                      });
+                      firebaseData["values"].forEach(function(hash) {
+                        hash["x"] = new Date(hash["x"]);
+                      });
+                      goinstantData["values"].forEach(function(hash) {
+                        hash["x"] = new Date(hash["x"]);
+                      });
+
+                      var serviceData = [pusherData, pubnubData, realtimecoData, firebaseData, goinstantData];
+
+                      d3.select('#chart_js_latency svg')    
+                        .datum(serviceData)
+                        .call(chart);
+
+                      //Update the chart when window resizes.
+                      nv.utils.windowResize(function() { chart.update() });
+                      return chart;
+                    });
+          }
+        });      
         
         $.ajax({
           type: 'POST',
@@ -330,12 +392,67 @@
         });      
       });
 
+      mongoUpdateChannel.bind( 'js-latencies-update', function( message ) {
+        var current_timeframe = $(".current-timeframe").attr("data-timeframe");
+        $.ajax({
+          type: 'POST',
+          url: '/new_js_latency_data',
+          data: { since: current_timeframe },
+          success: function (response) {
+                    console.log(response);
+                    var updatedData = response;
+                    
+                    nv.addGraph(function() {
+                      var chart = nv.models.lineChart()
+                        .margin({left: 100, bottom: 100})  
+                        .useInteractiveGuideline(true)  
+                        .transitionDuration(350)  
+                        .showLegend(true)       
+                        .showYAxis(true)        
+                        .showXAxis(true)
+                        .forceY(0);
+                      
+                      chart.xAxis 
+                        .rotateLabels(-45)
+                        .tickFormat(function(d) { return d3.time.format('%d-%m-%Y %H:%M:%S')(new Date(d)) });
+                       
+                      chart.yAxis
+                        .axisLabel('Latency (ms)')
+                        .tickFormat(d3.format('.0f'));
+    
+                      var pusherData = JSON.parse(updatedData[0]);
+                      var pubnubData = JSON.parse(updatedData[1]);
+                      var realtimecoData = JSON.parse(updatedData[2]);
+                      var firebaseData = JSON.parse(updatedData[3]);
+                      var goinstantData = JSON.parse(updatedData[4]);
 
-    :css
-      #chart_latency svg {
-        height: 500px;
-      }
+                      // Make the dates easy for d3 to work with
+                      pusherData["values"].forEach(function(hash) {
+                        hash["x"] = new Date(hash["x"]);
+                      });
+                      pubnubData["values"].forEach(function(hash) {
+                        hash["x"] = new Date(hash["x"]);
+                      });
+                      realtimecoData["values"].forEach(function(hash) {
+                        hash["x"] = new Date(hash["x"]);
+                      });
+                      firebaseData["values"].forEach(function(hash) {
+                        hash["x"] = new Date(hash["x"]);
+                      });
+                      goinstantData["values"].forEach(function(hash) {
+                        hash["x"] = new Date(hash["x"]);
+                      });
 
-      #chart_js_latency svg {
-        height: 500px;
-      }
+                      var serviceData = [pusherData, pubnubData, realtimecoData, firebaseData, goinstantData];
+
+                      d3.select('#chart_js_latency svg')    
+                        .datum(serviceData)
+                        .call(chart);
+
+                      //Update the chart when window resizes.
+                      nv.utils.windowResize(function() { chart.update() });
+                      return chart;
+                    });
+          }
+        });      
+      });

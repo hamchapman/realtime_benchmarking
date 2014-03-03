@@ -7,12 +7,15 @@ require 'json'
 require 'haml'
 require 'pusher'
 require 'chronic'
+require './lib/helpers/helpers'
 require './lib/pusher'
 require './lib/realtime_co'
 require './lib/pubnub'
 require './lib/services_runner'
 
 class BenchmarkAnalysis < Sinatra::Base
+
+  helpers ApplicationHelper
 
   @@pusher_colour = '#ff7f0e'
   @@pubnub_colour = '#3c9fad'
@@ -105,6 +108,17 @@ class BenchmarkAnalysis < Sinatra::Base
     combined_data = seperated_realiability_data(reliability_data).to_json
   end
 
+  post '/new_js_latency_data' do
+    content_type :json
+    since_time = Chronic.parse(params["since"])
+    if since_time
+      js_latency_data = settings.mongo_db['realtime_benchmarks']['js_latencies'].find({ time: { "$gt" => since_time } }, sort: ["time", 1]).to_a
+    else
+      js_latency_data = settings.mongo_db['realtime_benchmarks']['js_latencies'].find({ time: { "$gt" => Time.now - 7*24*60*60 } }, sort: ["time", 1]).to_a
+    end
+    combined_data = separated_js_latency_data(js_latency_data).to_json
+  end
+
   # post '/new_speed_data' do
   #   content_type :json
   #   since_time = Chronic.parse(params["since"])
@@ -131,47 +145,6 @@ class BenchmarkAnalysis < Sinatra::Base
     response = Pusher[params[:channel_name]].authenticate(params[:socket_id])
     content_type :json
     return response.to_json
-  end
-
-  helpers do
-    def latency_data_for service, colour, data
-      service_data = data.select { |entry| entry['service'] == service }
-      service_data.each do |hash|
-        hash[:x] = hash.delete "time"
-        hash[:y] = hash.delete "latency"
-        hash.delete "_id"
-        hash.delete "service"
-      end
-      puts({ values: service_data, key: service, color: colour })
-      { values: service_data, key: service, color: colour }.to_json
-    end
-
-    def reliability_data_for service, colour, data
-      service_data = data.select { |entry| entry['service'] == service }
-      reliability = service_data.inject(0) { |memo, obj| memo += obj['reliability'] } / service_data.length if !service_data.empty?
-
-      { service: service, reliability: reliability, color: colour }.to_json
-    end
-
-    def seperated_realiability_data reliability_data
-      pusher_reliability = reliability_data_for 'pusher', @@pusher_colour, reliability_data
-      pubnub_reliability = reliability_data_for 'pubnub', @@pubnub_colour, reliability_data
-      realtime_co_reliability = reliability_data_for 'realtime_co', @@realtime_co_colour, reliability_data
-      [pusher_reliability, pubnub_reliability, realtime_co_reliability]
-    end
-
-    def separated_latency_data latency_data
-      pusher_latency = latency_data_for 'pusher', @@pusher_colour, latency_data
-      pubnub_latency = latency_data_for 'pubnub', @@pubnub_colour, latency_data
-      realtime_co_latency = latency_data_for 'realtime_co', @@realtime_co_colour, latency_data
-      [pusher_latency, pubnub_latency, realtime_co_latency]
-    end
-
-    def save_latencies_to_db latencies
-      latencies.each do |service, latency|
-        $js_latencies_coll.insert( { service: service, time: Time.now, latency: latency } )
-      end
-    end
   end
 
   run! if app_file == $0

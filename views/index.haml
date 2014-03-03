@@ -273,11 +273,14 @@
           var yValue = point["y"];
           console.log(yValue);
             if (yValue > serviceWideMaxY) {
+              console.log("And this is a bigger one");
+              console.log(yValue);
               serviceWideMaxY = yValue;
             }
           })
         });
-
+        
+        console.log("Here is the biggest");
         console.log(serviceWideMaxY);
 
         var chart = nv.models.lineChart()

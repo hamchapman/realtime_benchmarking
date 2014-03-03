@@ -42,7 +42,10 @@
               RealtimeCo
             %h3.realtimeco-reliability-score
 
-      #chart
+      #chart_latency
+        %svg
+
+      #chart_js_latency
         %svg
     
     :javascript
@@ -67,7 +70,6 @@
                         .showXAxis(true);
                       
                       chart.xAxis 
-                        .axisLabel('Date')
                         .rotateLabels(-45)
                         .tickFormat(function(d) { return d3.time.format('%d-%m-%Y %H:%M:%S')(new Date(d)) });
                        
@@ -94,7 +96,7 @@
 
                       var serviceData = [pusherData, pubnubData, realtimecoData];
 
-                      d3.select('#chart svg')    
+                      d3.select('#chart_latency svg')    
                         .datum(serviceData)
                         .call(chart);
 
@@ -123,6 +125,8 @@
         });
       });
 
+      // Adding Ruby latency graph
+
       nv.addGraph(function() {
         var chart = nv.models.lineChart()
           .margin({left: 100, bottom: 120})  
@@ -133,7 +137,6 @@
           .showXAxis(true);
       
         chart.xAxis 
-          .axisLabel('Date')
           .rotateLabels(-45)
           .tickFormat(function(d) { return d3.time.format('%d-%m-%Y %H:%M:%S')(new Date(d)) });
        
@@ -160,8 +163,77 @@
 
         var serviceData = [pusherData, pubnubData, realtimecoData];
        
-        d3.select('#chart svg')    
+        d3.select('#chart_latency svg')    
           .datum(serviceData)         
+          .call(chart);
+       
+        //Update the chart when window resizes.
+        nv.utils.windowResize(function() { chart.update() });
+        return chart;
+      });
+
+      // Adding JS latency graph
+
+      nv.addGraph(function() {
+        var pusherJSData = #{@pusher_js_latency};
+        var pubnubJSData = #{@pubnub_js_latency};
+        var realtimecoJSData = #{@realtime_co_js_latency};
+        var firebaseJSData = #{@firebase_js_latency};
+        var goinstantJSData = #{@goinstant_js_latency};
+
+        // Make the dates easy for d3 to work with
+        pusherJSData["values"].forEach(function(hash) {
+          hash["x"] = new Date(hash["x"]);
+        });
+        pubnubJSData["values"].forEach(function(hash) {
+          hash["x"] = new Date(hash["x"]);
+        });
+        realtimecoJSData["values"].forEach(function(hash) {
+          hash["x"] = new Date(hash["x"]);
+        });
+        firebaseJSData["values"].forEach(function(hash) {
+          hash["x"] = new Date(hash["x"]);
+        });
+        goinstantJSData["values"].forEach(function(hash) {
+          hash["x"] = new Date(hash["x"]);
+        });
+
+        var serviceJSData = [pusherJSData, pubnubJSData, realtimecoJSData, firebaseJSData, goinstantJSData];
+
+        var serviceWideMaxY = 0;
+
+        // Calculate maximum y value in JS latency data
+
+        serviceJSData.forEach(function(individualServiceData) {
+          var dataPoints = individualServiceData["values"];
+          dataPoints.forEach(function(point) {
+          var yValue = point["y"];
+            if (yValue > serviceWideMaxY) {
+              serviceWideMaxY = yValue;
+            }
+          })
+        });
+
+
+        var chart = nv.models.lineChart()
+          .margin({left: 100, bottom: 120})  
+          .useInteractiveGuideline(true)  
+          .transitionDuration(350)  
+          .showLegend(true)       
+          .showYAxis(true)        
+          .showXAxis(true)
+          .forceY([0, serviceWideMaxY]);
+      
+        chart.xAxis
+          .rotateLabels(-45)
+          .tickFormat(function(d) { return d3.time.format('%d-%m-%Y %H:%M:%S')(new Date(d)) });
+       
+        chart.yAxis
+          .axisLabel('Latency (ms)')
+          .tickFormat(d3.format('.0f'));
+       
+        d3.select('#chart_js_latency svg')    
+          .datum(serviceJSData)         
           .call(chart);
        
         //Update the chart when window resizes.
@@ -171,18 +243,10 @@
 
       var pusherReliability = #{@pusher_reliability};
       $(".pusher-reliability-score").text(pusherReliability["reliability"] + "%")
-      // $(".pusher-reliability-score").css( "color", pusherReliability["color"] );
-      // $(".pusher-title").css( "color", pusherReliability["color"] );
-
       var pubnubReliability = #{@pubnub_reliability};
       $(".pubnub-reliability-score").text(pubnubReliability["reliability"] + "%")
-      // $(".pubnub-reliability-score").css( "color", pubnubReliability["color"] );
-      // $(".pubnub-title").css( "color", pubnubReliability["color"] );
-
       var realtimecoReliability = #{@realtime_co_reliability};
       $(".realtimeco-reliability-score").text(realtimecoReliability["reliability"] + "%")
-      // $(".realtimeco-reliability-score").css( "color", realtimecoReliability["color"] );
-      // $(".realtimeco-title").css( "color", realtimecoReliability["color"] );
 
       var pusher = new Pusher( 'a8536d1bddd6f5951242' );
       var mongoUpdateChannel = pusher.subscribe( 'mongo' );
@@ -228,7 +292,6 @@
                         .showXAxis(true);
                       
                       chart.xAxis 
-                        .axisLabel('Date')
                         .rotateLabels(-45)
                         .tickFormat(function(d) { return d3.time.format('%d-%m-%Y %H:%M:%S')(new Date(d)) });
                        
@@ -255,7 +318,7 @@
 
                       var serviceData = [pusherData, pubnubData, realtimecoData];
 
-                      d3.select('#chart svg')    
+                      d3.select('#chart_latency svg')    
                         .datum(serviceData)
                         .call(chart);
 
@@ -269,6 +332,10 @@
 
 
     :css
-      #chart svg {
+      #chart_latency svg {
+        height: 500px;
+      }
+
+      #chart_js_latency svg {
         height: 500px;
       }

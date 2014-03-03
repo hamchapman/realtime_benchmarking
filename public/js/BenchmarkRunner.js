@@ -102,7 +102,7 @@ BenchmarkRunner.prototype._nextTest = function() {
     var combinedResults = {};
     for( var service in this._serviceLatencyResults ) {
         var result = this._serviceLatencyResults[service];
-        combinedResults[service] = BenchmarkRunner.getAverage(result);
+        combinedResults[service.toLowerCase()] = BenchmarkRunner.getAverage(result);
         this.onLog( 'RESULT for ' + service + ': ' + result.join( '\t' ) +
                  '\t(Average: ' + BenchmarkRunner.getAverage( result ) + 'ms)' );
     }

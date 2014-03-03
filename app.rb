@@ -17,6 +17,8 @@ class BenchmarkAnalysis < Sinatra::Base
   @@pusher_colour = '#ff7f0e'
   @@pubnub_colour = '#3c9fad'
   @@realtime_co_colour = '#ad007b'
+  @@goinstant_colour = '#0022e2'
+  @@firebase_colour = '#00b109'
 
   include Mongo
 
@@ -33,23 +35,23 @@ class BenchmarkAnalysis < Sinatra::Base
     set :mongo_db, conn.db('realtime_benchmarks')
   end
     
-  # configure do
-  #   scheduler = Rufus::Scheduler.new
-  #   set :scheduler, scheduler
-  #   if ENV['MONGOHQ_URL']
-  #     scheduler.every('5m') do
-  #       puts "Running tests"
-  #       runner = ServicesRunner.new "heroku_tester"
-  #       runner.run_benchmarks
-  #     end
-  #   else
-  #     scheduler.every('1m') do
-  #       puts "Running tests"
-  #       runner = ServicesRunner.new "local_tester"
-  #       runner.run_benchmarks
-  #     end
-  #   end
-  # end
+  configure do
+    scheduler = Rufus::Scheduler.new
+    set :scheduler, scheduler
+    if ENV['MONGOHQ_URL']
+      scheduler.every('5m') do
+        puts "Running tests"
+        runner = ServicesRunner.new "heroku_tester"
+        runner.run_benchmarks
+      end
+    else
+      scheduler.every('1m') do
+        puts "Running tests"
+        # runner = ServicesRunner.new "local_tester"
+        # runner.run_benchmarks
+      end
+    end
+  end
 
   Pusher.app_id = '66498'
   Pusher.key = 'a8536d1bddd6f5951242'
@@ -61,15 +63,22 @@ class BenchmarkAnalysis < Sinatra::Base
   $js_latencies_coll = mongo_db['realtime_benchmarks']['js_latencies']
 
   get '/' do 
-    latency_data = settings.mongo_db['realtime_benchmarks']['latencies'].find({}, sort: ["time", 1]).to_a
+    latency_data = settings.mongo_db['realtime_benchmarks']['latencies'].find({ time: { "$gt" => Time.now - 7*24*60*60 } }, sort: ["time", 1]).to_a
     @pusher_latency = latency_data_for 'pusher', @@pusher_colour, latency_data
     @pubnub_latency = latency_data_for 'pubnub', @@pubnub_colour, latency_data
     @realtime_co_latency = latency_data_for 'realtime_co', @@realtime_co_colour, latency_data
 
-    reliability_data = settings.mongo_db['realtime_benchmarks']['reliabilities'].find({}, sort: ["time", 1]).to_a
+    reliability_data = settings.mongo_db['realtime_benchmarks']['reliabilities'].find({ time: { "$gt" => Time.now - 7*24*60*60 } }, sort: ["time", 1]).to_a
     @pusher_reliability = reliability_data_for 'pusher', @@pusher_colour, reliability_data
     @pubnub_reliability = reliability_data_for 'pubnub', @@pubnub_colour, reliability_data
     @realtime_co_reliability = reliability_data_for 'realtime_co', @@realtime_co_colour, reliability_data
+
+    js_latency_data = settings.mongo_db['realtime_benchmarks']['js_latencies'].find({ time: { "$gt" => Time.now - 7*24*60*60 } }, sort: ["time", 1]).to_a
+    @pusher_js_latency = latency_data_for 'pusher', @@pusher_colour, js_latency_data
+    @pubnub_js_latency = latency_data_for 'pubnub', @@pubnub_colour, js_latency_data
+    @realtime_co_js_latency = latency_data_for 'realtimeco', @@realtime_co_colour, js_latency_data
+    @goinstant_js_latency = latency_data_for 'goinstant', @@goinstant_colour, js_latency_data
+    @firebase_js_latency = latency_data_for 'firebase', @@firebase_colour, js_latency_data
 
     haml :index
   end
@@ -133,7 +142,7 @@ class BenchmarkAnalysis < Sinatra::Base
         hash.delete "_id"
         hash.delete "service"
       end
-
+      puts({ values: service_data, key: service, color: colour })
       { values: service_data, key: service, color: colour }.to_json
     end
 

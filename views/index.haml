@@ -272,10 +272,10 @@
           dataPoints.forEach(function(point) {
           var yValue = point["y"];
           console.log(yValue);
-            if (yValue > serviceWideMaxY) {
+            if (parseFloat(yValue) > serviceWideMaxY) {
               console.log("And this is a bigger one");
               console.log(yValue);
-              serviceWideMaxY = yValue;
+              serviceWideMaxY = parseFloat(yValue);
             }
           })
         });

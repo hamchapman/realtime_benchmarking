@@ -402,15 +402,13 @@
                     console.log(response);
                     var updatedData = response;
                     
-                    console.log(updatedData);
-                    
+                    console.log(updatedData);                    
                     var serviceWideMaxY = 0;
 
                     // Calculate maximum y value in JS latency data
 
                     updatedData.forEach(function(individualServiceData) {
-                      var dataPoints = individualServiceData["values"];
-                      console
+                      var dataPoints = JSON.parse(individualServiceData)["values"];
                       dataPoints.forEach(function(point) {
                       var yValue = point["y"];
                         if (parseFloat(yValue) > serviceWideMaxY) {

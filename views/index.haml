@@ -271,6 +271,7 @@
           var dataPoints = individualServiceData["values"];
           dataPoints.forEach(function(point) {
           var yValue = point["y"];
+          console.log(yValue);
             if (yValue > serviceWideMaxY) {
               serviceWideMaxY = yValue;
             }
@@ -403,7 +404,9 @@
           success: function (response) {
                     console.log(response);
                     var updatedData = response;
-
+                    
+                    console.log(updatedData);
+                    
                     var serviceWideMaxY = 0;
 
                     // Calculate maximum y value in JS latency data

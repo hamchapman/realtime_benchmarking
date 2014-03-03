@@ -25,14 +25,14 @@ textarea, input {
 
 .sidebar {
   float: left;
-  width: 10%;
+  width: 13%;
   font-weight: 600;
   font-size: 1.3em;
 }
 
 .content {
   float: left;
-  width: 90%;
+  width: 87%;
 }
 
 .main-heading {
@@ -53,6 +53,11 @@ textarea, input {
 .latency-sidebar {
   margin-top: 240px;
   padding-left: 20px;
+}
+
+.js-latency-sidebar {
+  margin-top: 460px;
+  padding-left: 20px; 
 }
 
 .timeframe {

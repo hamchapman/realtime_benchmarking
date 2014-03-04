@@ -15,7 +15,7 @@ describe 'Benchmark Analysis App' do
       $reliabilities_coll.insert( { service: "pusher", time: time, reliability: 100 } )
       $reliabilities_coll.insert( { service: "pusher", time: time, reliability: 50 } )
 
-      $js_latencies_coll.insert( { service: "pusher", time: time, latency: 50 } )
+      $js_latencies_coll.insert( { service: "pusher", time: time, latency: 350 } )
       $js_latencies_coll.insert( { service: "pusher", time: time + 3600, latency: 150 } )
       $js_latencies_coll.insert( { service: "pusher", time: time + 36000, latency: 250 } )
       $js_latencies_coll.insert( { service: "pubnub", time: time, latency: 100 } )
@@ -58,7 +58,7 @@ describe 'Benchmark Analysis App' do
     it 'shows the javascript latency graph y-axis ranges/scales correctly' do
       visit '/'
       expect(page.first("#chart_js_latency .nv-y .nv-axisMaxMin text").text).to eq "0"
-      expect(page.all("#chart_js_latency .nv-y .nv-axisMaxMin text")[1].text).to eq "300"
+      expect(page.all("#chart_js_latency .nv-y .nv-axisMaxMin text")[1].text).to eq "350"
     end
 
     it 'shows the correct reliability score', js: true do
@@ -67,8 +67,8 @@ describe 'Benchmark Analysis App' do
     end
   end
 
-  context 'Updating the graphs' do    
-    it 'the ruby latency graph should update in realtime' do
+  context 'Updating the graphs and reliabilities in realtime' do    
+    it 'the ruby latency graph updates' do
       visit '/'
       expect(page.first("#chart_latency .nv-y .nv-axisMaxMin text").text).to eq "20"
       expect(page.all("#chart_latency .nv-y .nv-axisMaxMin text")[1].text).to eq "300"
@@ -79,10 +79,10 @@ describe 'Benchmark Analysis App' do
       expect(page.all("#chart_latency .nv-y .nv-axisMaxMin text")[1].text).to eq "400"
     end
 
-    it 'the javascript latency graph should update in realtime' do
+    it 'the javascript latency graph updates' do
       visit '/'
       expect(page.first("#chart_js_latency .nv-y .nv-axisMaxMin text").text).to eq "0"
-      expect(page.all("#chart_js_latency .nv-y .nv-axisMaxMin text")[1].text).to eq "300"
+      expect(page.all("#chart_js_latency .nv-y .nv-axisMaxMin text")[1].text).to eq "350"
       $js_latencies_coll.insert( { service: "pusher", time: time + 39600, latency: 10 } )
       $js_latencies_coll.insert( { service: "pubnub", time: time + 39600, latency: 400 } )
       Pusher.trigger('mongo', 'js-latencies-update', 'Mongo updated')
@@ -90,6 +90,17 @@ describe 'Benchmark Analysis App' do
       expect(page.all("#chart_js_latency .nv-y .nv-axisMaxMin text")[1].text).to eq "400"
     end
 
+    it 'the reliability score updates', js: true do
+      visit '/' 
+      expect(page.find('.reliabilities .pusher-reliability-score').text).to eq "75%"
+      $reliabilities_coll.insert( { service: "pusher", time: time + 39600, reliability: 90 } )
+      Pusher.trigger('mongo', 'reliabilities-update', 'Mongo updated')
+      expect(page.find('.reliabilities .pusher-reliability-score').text).to eq "80%"
+    end
+
+  end
+
+  context 'Updating the graphs and reliabilities when a "show data sine" time is specified' do
     it 'the ruby latency graph updates when a time is specified in the "view data since" input' do
       visit '/'
       expect(page.first("#chart_latency .nv-y .nv-axisMaxMin text").text).to eq "20"
@@ -100,9 +111,14 @@ describe 'Benchmark Analysis App' do
       expect(page.all("#chart_latency .nv-y .nv-axisMaxMin text")[1].text).to eq "300"
     end
 
-    xit 'the javascript latency graph updates when a time is specified in the "view data since" input' do
-
+    it 'the javascript latency graph updates when a time is specified in the "view data since" input' do
+      visit '/'
+      expect(page.first("#chart_js_latency .nv-y .nv-axisMaxMin text").text).to eq "0"
+      expect(page.all("#chart_js_latency .nv-y .nv-axisMaxMin text")[1].text).to eq "350"
+      fill_in 'time', with: 'yesterday 10:30am'
+      click_button 'Update'
+      expect(page.first("#chart_js_latency .nv-y .nv-axisMaxMin text").text).to eq "0"
+      expect(page.all("#chart_js_latency .nv-y .nv-axisMaxMin text")[1].text).to eq "300"
     end
-
   end
 end

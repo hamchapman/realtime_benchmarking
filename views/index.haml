@@ -70,27 +70,6 @@
             .axisLabel('Latency (ms)')
             .tickFormat(d3.format('.0f'));
           
-
-          // var pusherData = #{@pusher_latency};
-          // var pubnubData = #{@pubnub_latency};
-          // var realtimecoData = #{@realtime_co_latency};
-
-
-          //// Make the dates easy for d3 to work with
-          // pusherData["values"].forEach(function(hash) {
-          //   hash["x"] = new Date(hash["x"]);
-          // });
-
-          // pubnubData["values"].forEach(function(hash) {
-          //   hash["x"] = new Date(hash["x"]);
-          // });
-
-          // realtimecoData["values"].forEach(function(hash) {
-          //   hash["x"] = new Date(hash["x"]);
-          // });
-
-          // var serviceData = [pusherData, pubnubData, realtimecoData];
-          
           var serviceData = [#{@pusher_latency}, #{@pubnub_latency}, #{@realtime_co_latency}];
 
           serviceData.forEach(function(individualServiceData) {
@@ -103,53 +82,12 @@
             .datum(serviceData)         
             .call(chart);
          
-          //Update the chart when window resizes.
           nv.utils.windowResize(function() { chart.update() });
           return chart;
         });
 
         // Adding JS latency graph
-
-        nv.addGraph(function() {
-          
-          // var pusherJSData = #{@pusher_js_latency};
-          // var pubnubJSData = #{@pubnub_js_latency};
-          // var realtimecoJSData = #{@realtime_co_js_latency};
-          // var firebaseJSData = #{@firebase_js_latency};
-          // var goinstantJSData = #{@goinstant_js_latency};
-          
-          //// Make the dates easy for d3 to work with
-          // pusherJSData["values"].forEach(function(hash) {
-          //   hash["x"] = new Date(hash["x"]);
-          // });
-          // pubnubJSData["values"].forEach(function(hash) {
-          //   hash["x"] = new Date(hash["x"]);
-          // });
-          // realtimecoJSData["values"].forEach(function(hash) {
-          //   hash["x"] = new Date(hash["x"]);
-          // });
-          // firebaseJSData["values"].forEach(function(hash) {
-          //   hash["x"] = new Date(hash["x"]);
-          // });
-          // goinstantJSData["values"].forEach(function(hash) {
-          //   hash["x"] = new Date(hash["x"]);
-          // });
-
-          // var serviceJSData = [pusherJSData, pubnubJSData, realtimecoJSData, firebaseJSData, goinstantJSData];
-
-          // var serviceWideMaxY = 0;
-
-          //// Calculate maximum y value in JS latency data
-          // serviceJSData.forEach(function(individualServiceData) {
-          //   var dataPoints = individualServiceData["values"];
-          //   dataPoints.forEach(function(point) {
-          //   var yValue = point["y"];
-          //     if (parseFloat(yValue) > serviceWideMaxY) {
-          //       serviceWideMaxY = parseFloat(yValue);
-          //     }
-          //   })
-          // });
-  
+        nv.addGraph(function() {  
           var serviceJSData = [#{@pusher_js_latency}, #{@pubnub_js_latency}, #{@realtime_co_js_latency}, #{@firebase_js_latency}, #{@goinstant_js_latency}];
           var serviceWideMaxY = 0;
 

@@ -3,13 +3,15 @@ require './app'
 require 'json'
 require 'capybara'
 require 'rack/test'
+require 'capybara/poltergeist'
+require 'sinatra'
 
 def app
   BenchmarkAnalysis
 end
 
 Capybara.app = Sinatra::Application
-
+Capybara.javascript_driver = :poltergeist
 
 RSpec.configure do |config|
   
@@ -18,3 +20,6 @@ RSpec.configure do |config|
 
   config.order = 'random'
 end
+
+
+

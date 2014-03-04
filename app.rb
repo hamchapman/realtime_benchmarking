@@ -7,11 +7,8 @@ require 'json'
 require 'haml'
 require 'pusher'
 require 'chronic'
-require './lib/helpers/helpers'
-require './lib/pusher'
-require './lib/realtime_co'
-require './lib/pubnub'
-require './lib/services_runner'
+require 'helpers/helpers'
+require 'services_runner'
 
 class BenchmarkAnalysis < Sinatra::Base
 
@@ -88,33 +85,21 @@ class BenchmarkAnalysis < Sinatra::Base
   post '/new_latency_data' do
     content_type :json
     since_time = Chronic.parse(params["since"])
-    if since_time
-      latency_data = time_specific_data 'latencies', since_time
-    else
-      latency_data = last_week_data 'latencies'
-    end
+    since_time ? latency_data = time_specific_data('latencies', since_time) : latency_data = last_week_data('latencies')
     combined_data = separated_latency_data(latency_data).to_json
   end
 
   post '/new_reliability_data' do
     content_type :json
     since_time = Chronic.parse(params["since"])
-    if since_time
-      reliability_data = time_specific_data 'reliabilities', since_time
-    else
-      reliability_data = last_week_data 'reliabilities'
-    end
+    since_time ? reliability_data = time_specific_data('reliabilities', since_time) : reliability_data = last_week_data('reliabilities')
     combined_data = seperated_realiability_data(reliability_data).to_json
   end
 
   post '/new_js_latency_data' do
     content_type :json
     since_time = Chronic.parse(params["since"])
-    if since_time
-      js_latency_data = time_specific_data 'js_latencies', since_time
-    else
-      js_latency_data = last_week_data 'js_latencies'
-    end
+    since_time ? js_latency_data = time_specific_data('js_latencies', since_time) : js_latency_data = last_week_data('js_latencies')
     combined_data = separated_js_latency_data(js_latency_data).to_json
   end
 

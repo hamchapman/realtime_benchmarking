@@ -1,6 +1,9 @@
-require_relative 'pusher'
-require_relative 'pubnub'
-require_relative 'realtime_co'
+# require 'pusher_benchmarker'
+# require 'pubnub'
+# require 'realtime_co'
+require 'pusher_benchmarker'
+require 'pubnub_benchmarker'
+require 'realtime_co_benchmarker'
 
 class ServicesRunner
 
@@ -10,10 +13,10 @@ class ServicesRunner
   end
 
   def initialize_services channel
-    @pusher = PusherBenchmarker.new channel
-    @pubnub = PubnubBenchmarker.new channel
+    @pusher = Benchmarker::PusherBenchmarker.new channel
+    @pubnub = Benchmarker::PubnubBenchmarker.new channel
     sleep 2
-    @realtime_co = RealtimeCoBenchmarker.new channel
+    @realtime_co = Benchmarker::RealtimeCoBenchmarker.new channel
     @services += [@pusher, @pubnub, @realtime_co]
   end
 

@@ -29,6 +29,9 @@ class BenchmarkAnalysis < Sinatra::Base
     db_connection.authenticate(db.user, db.password) unless (db.user.nil? || db.user.nil?)
     db_connection
     set :mongo_db, db_connection
+  elsif ENV["RACK_ENV"] == 'test'
+    conn = MongoClient.new("localhost", 27017)
+    set :mongo_db, conn.db('realtime_benchmarks_test')
   else
     conn = MongoClient.new("localhost", 27017)
     set :mongo_db, conn.db('realtime_benchmarks')
@@ -56,10 +59,17 @@ class BenchmarkAnalysis < Sinatra::Base
   Pusher.key = 'a8536d1bddd6f5951242'
   Pusher.secret = '0c80607ae8d716a716bb'
 
-  $latencies_coll =  mongo_db['realtime_benchmarks']['latencies']
-  $reliabilities_coll =  mongo_db['realtime_benchmarks']['reliabilities']
-  $speeds_coll =  mongo_db['realtime_benchmarks']['speeds']
-  $js_latencies_coll = mongo_db['realtime_benchmarks']['js_latencies']
+  if ENV["RACK_ENV"] == 'test'
+    $latencies_coll =  mongo_db['realtime_benchmarks_test']['latencies']
+    $reliabilities_coll =  mongo_db['realtime_benchmarks_test']['reliabilities']
+    $speeds_coll =  mongo_db['realtime_benchmarks_test']['speeds']
+    $js_latencies_coll = mongo_db['realtime_benchmarks_test']['js_latencies']
+  else
+    $latencies_coll =  mongo_db['realtime_benchmarks']['latencies']
+    $reliabilities_coll =  mongo_db['realtime_benchmarks']['reliabilities']
+    $speeds_coll =  mongo_db['realtime_benchmarks']['speeds']
+    $js_latencies_coll = mongo_db['realtime_benchmarks']['js_latencies']
+  end
 
   get '/' do 
     latency_data = last_week_data 'latencies'

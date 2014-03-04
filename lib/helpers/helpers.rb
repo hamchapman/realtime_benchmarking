@@ -48,11 +48,14 @@ module ApplicationHelper
   end
 
   def time_specific_data collection, since_time
-    settings.mongo_db['realtime_benchmarks']["#{collection}"].find({ time: { "$gt" => since_time } }, sort: ["time", 1]).to_a
+    ENV['RACK_ENV'] == 'test' ? settings.mongo_db['realtime_benchmarks_test']["#{collection}"].find({ time: { "$gt" => since_time } }, sort: ["time", 1]).to_a
+                              : settings.mongo_db['realtime_benchmarks']["#{collection}"].find({ time: { "$gt" => since_time } }, sort: ["time", 1]).to_a
+      
   end
 
   def last_week_data collection
-    settings.mongo_db['realtime_benchmarks']["#{collection}"].find({ time: { "$gt" => Time.now - 7*24*60*60 } }, sort: ["time", 1]).to_a
+    ENV['RACK_ENV'] == 'test' ? settings.mongo_db['realtime_benchmarks_test']["#{collection}"].find({ time: { "$gt" => Time.now - 7*24*60*60 } }, sort: ["time", 1]).to_a
+                              : settings.mongo_db['realtime_benchmarks']["#{collection}"].find({ time: { "$gt" => Time.now - 7*24*60*60 } }, sort: ["time", 1]).to_a
   end
 
 end

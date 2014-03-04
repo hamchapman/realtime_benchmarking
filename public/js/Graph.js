@@ -73,7 +73,7 @@
                     .axisLabel('Latency (ms)')
                     .tickFormat(d3.format('.0f'));
 
-                  var serviceData = [JSON.parse(updatedData[0]), JSON.parse(updatedData[1]), JSON.parse(updatedData[2]), JSON.parse(updatedData[3]), JSON.parse(updatedData[4]];
+                  var serviceData = [JSON.parse(updatedData[0]), JSON.parse(updatedData[1]), JSON.parse(updatedData[2]), JSON.parse(updatedData[3]), JSON.parse(updatedData[4])];
                   
                   // Make the dates easy for d3 to work with
                   serviceData.forEach(function(individualServiceData) {
@@ -224,7 +224,7 @@
                     .axisLabel('Latency (ms)')
                     .tickFormat(d3.format('.0f'));
 
-                  var serviceData = [JSON.parse(updatedData[0]), JSON.parse(updatedData[1]), JSON.parse(updatedData[2]), JSON.parse(updatedData[3]), JSON.parse(updatedData[4]];
+                  var serviceData = [JSON.parse(updatedData[0]), JSON.parse(updatedData[1]), JSON.parse(updatedData[2]), JSON.parse(updatedData[3]), JSON.parse(updatedData[4])];
                   
                   // Make the dates easy for d3 to work with
                   serviceData.forEach(function(individualServiceData) {

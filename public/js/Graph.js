@@ -27,26 +27,7 @@
                   chart.yAxis
                     .axisLabel('Latency (ms)')
                     .tickFormat(d3.format('.0f'));
-
-
-                  // var pusherData = JSON.parse(updatedData[0]);
-                  // var pubnubData = JSON.parse(updatedData[1]);
-                  // var realtimecoData = JSON.parse(updatedData[2]);
-
-                  // pusherData["values"].forEach(function(hash) {
-                  //   hash["x"] = new Date(hash["x"]);
-                  // });
-
-                  // pubnubData["values"].forEach(function(hash) {
-                  //   hash["x"] = new Date(hash["x"]);
-                  // });
-
-                  // realtimecoData["values"].forEach(function(hash) {
-                  //   hash["x"] = new Date(hash["x"]);
-                  // });
-
-                  // var serviceData = [pusherData, pubnubData, realtimecoData];
-                  
+                    
                   var serviceData = [JSON.parse(updatedData[0], JSON.parse(updatedData[0]), JSON.parse(updatedData[2])];
                   
                   // Make the dates easy for d3 to work with
@@ -251,32 +232,6 @@
                       hash["x"] = new Date(hash["x"]);
                     });
                   });
-
-                  // var pusherData = JSON.parse(updatedData[0]);
-                  // var pubnubData = JSON.parse(updatedData[1]);
-                  // var realtimecoData = JSON.parse(updatedData[2]);
-                  // var firebaseData = JSON.parse(updatedData[3]);
-                  // var goinstantData = JSON.parse(updatedData[4]);
-
-
-                  // // Make the dates easy for d3 to work with
-                  // pusherData["values"].forEach(function(hash) {
-                  //   hash["x"] = new Date(hash["x"]);
-                  // });
-                  // pubnubData["values"].forEach(function(hash) {
-                  //   hash["x"] = new Date(hash["x"]);
-                  // });
-                  // realtimecoData["values"].forEach(function(hash) {
-                  //   hash["x"] = new Date(hash["x"]);
-                  // });
-                  // firebaseData["values"].forEach(function(hash) {
-                  //   hash["x"] = new Date(hash["x"]);
-                  // });
-                  // goinstantData["values"].forEach(function(hash) {
-                  //   hash["x"] = new Date(hash["x"]);
-                  // });
-
-                  // var serviceData = [pusherData, pubnubData, realtimecoData, firebaseData, goinstantData];
 
                   d3.select('#chart_js_latency svg')    
                     .datum(serviceData)

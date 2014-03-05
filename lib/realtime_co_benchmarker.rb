@@ -3,13 +3,12 @@ require_relative 'ortc'
 module Benchmarker
   class RealtimeCoBenchmarker
 
-    attr_reader :ready, :subscribed
+    attr_reader :ready
 
     def initialize channel
       @channel = channel
       setup
       @benchmarks = []
-      @subscribed = false
       @ready = false
       
       @client.on_connected  do |sender|

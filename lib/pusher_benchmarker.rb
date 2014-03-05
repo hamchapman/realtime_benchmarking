@@ -5,7 +5,7 @@ require 'json'
 module Benchmarker
   class PusherBenchmarker
 
-    attr_reader :ready, :ready_for_next_tests
+    attr_reader :ready
 
     def initialize channel
       @channel = channel

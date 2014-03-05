@@ -64,7 +64,7 @@ module Benchmarker
         send({time: Time.now, id: num})
         sleep 0.2
       end
-      sleep 2.0
+      sleep 2
       $latencies_coll.insert( { service: "pubnub", time: Time.now, latency: average_latency } )
       Pusher.trigger('mongo', 'latencies-update', 'Mongo updated')
       puts @benchmarks.inspect
@@ -83,7 +83,7 @@ module Benchmarker
         send({time: Time.now, id: num})
         sleep 0.2
       end
-      sleep 2.0
+      sleep 2
       $reliabilities_coll.insert( { service: "pubnub", time: Time.now, reliability: calculate_reliability_percentage } )
       Pusher.trigger('mongo', 'reliabilities-update', 'Mongo updated')
       puts @benchmarks.inspect

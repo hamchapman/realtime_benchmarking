@@ -24,6 +24,7 @@ group :test do
   gem 'selenium-webdriver'
   gem 'poltergeist'
   gem 'launchy'
+  gem 'simplecov'
 end
 
 group :production do

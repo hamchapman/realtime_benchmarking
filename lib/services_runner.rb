@@ -1,6 +1,3 @@
-# require 'pusher_benchmarker'
-# require 'pubnub'
-# require 'realtime_co'
 require 'pusher_benchmarker'
 require 'pubnub_benchmarker'
 require 'realtime_co_benchmarker'

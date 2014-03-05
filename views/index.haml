@@ -50,11 +50,16 @@
         %svg
     
     :javascript
-      $( document ).ready(function() {
+      $(document).ready(function() {
+        var dateFormatIn =  d3.time.format.utc('%Y-%m-%d %H:%M:%S UTC');
+        var dateFormatOut =  d3.time.format.utc('%d-%m-%Y %H:%M:%S');
 
         // Adding Ruby latency graph
         nv.addGraph(function() {
+          var serviceData = [#{@pusher_latency}, #{@pubnub_latency}, #{@realtime_co_latency}];
+
           var chart = nv.models.lineChart()
+            .x(function(d){return dateFormatIn.parse(d.x);})
             .margin({left: 100, bottom: 120})  
             .useInteractiveGuideline(true)  
             .transitionDuration(350)  
@@ -64,20 +69,12 @@
         
           chart.xAxis 
             .rotateLabels(-45)
-            .tickFormat(function(d) { return d3.time.format('%d-%m-%Y %H:%M:%S')(new Date(d)) });
+            .tickFormat(function(d) { return dateFormatOut(new Date(d)) });
          
           chart.yAxis
             .axisLabel('Latency (ms)')
             .tickFormat(d3.format('.0f'));
           
-          var serviceData = [#{@pusher_latency}, #{@pubnub_latency}, #{@realtime_co_latency}];
-
-          serviceData.forEach(function(individualServiceData) {
-            individualServiceData["values"].forEach(function(hash) {
-              hash["x"] = new Date(hash["x"]);
-            });
-          });
-
           d3.select('#chart_latency svg')    
             .datum(serviceData)         
             .call(chart);
@@ -94,7 +91,6 @@
           // Make the dates easy for d3 to work with and calculate maximum y value
           serviceJSData.forEach(function(individualServiceData) {
             individualServiceData["values"].forEach(function(hash) {
-              hash["x"] = new Date(hash["x"]);
               var yValue = hash["y"];
               if (parseFloat(yValue) > serviceWideMaxY) {
                 serviceWideMaxY = parseFloat(yValue);
@@ -103,6 +99,7 @@
           });
 
           var chart = nv.models.lineChart()
+            .x(function(d){return dateFormatIn.parse(d.x);})
             .margin({left: 100, bottom: 120})  
             .useInteractiveGuideline(true)  
             .transitionDuration(350)  
@@ -113,7 +110,7 @@
         
           chart.xAxis
             .rotateLabels(-45)
-            .tickFormat(function(d) { return d3.time.format('%d-%m-%Y %H:%M:%S')(new Date(d)) });
+            .tickFormat(function(d) { return dateFormatOut(new Date(d)) });
          
           chart.yAxis
             .axisLabel('Latency (ms)')
@@ -128,10 +125,10 @@
         });
 
         var pusherReliability = #{@pusher_reliability};
-        $(".pusher-reliability-score").text(pusherReliability["reliability"] + "%")
+        $(".pusher-reliability-score").text(pusherReliability["reliability"] + "%");
         var pubnubReliability = #{@pubnub_reliability};
-        $(".pubnub-reliability-score").text(pubnubReliability["reliability"] + "%")
+        $(".pubnub-reliability-score").text(pubnubReliability["reliability"] + "%");
         var realtimecoReliability = #{@realtime_co_reliability};
-        $(".realtimeco-reliability-score").text(realtimecoReliability["reliability"] + "%")
+        $(".realtimeco-reliability-score").text(realtimecoReliability["reliability"] + "%");
 
       });

@@ -106,8 +106,6 @@ BenchmarkRunner.prototype._nextTest = function() {
         this.onLog( 'RESULT for ' + service + ': ' + result.join( '\t' ) +
                  '\t(Average: ' + BenchmarkRunner.getAverage( result ) + 'ms)' );
     }
-
-    // http://realtime-benchmarking.herokuapp.com/test
     
     $.ajax({
           type: 'POST',

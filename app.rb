@@ -45,12 +45,14 @@ class BenchmarkAnalysis < Sinatra::Base
         puts "Running tests"
         runner = ServicesRunner.new "heroku_tester"
         runner.run_benchmarks
+        runner = nil
       end
     else
       scheduler.every('2m') do
         puts "Running tests"
         runner = ServicesRunner.new "local_tester"
         runner.run_benchmarks
+        runner = nil
       end
     end
   end

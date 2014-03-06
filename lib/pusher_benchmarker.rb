@@ -14,10 +14,12 @@ module Benchmarker
       @ready = false
 
       @client.bind("pusher:connection_established") do |data|
-        subscribe      
+        subscribe
       end
 
       @client.bind('pusher_internal:subscription_succeeded') do |data|
+        puts "I'm subscribed"
+        puts Time.now
         @ready = true  
       end
 
@@ -43,7 +45,6 @@ module Benchmarker
         sent = Time.parse(JSON.parse(data)["time"]).to_f
         received = Time.now.to_f
         latency = (received - sent) * 1000
-        # puts latency
         puts data.inspect
         @benchmarks << { service: "pusher", time: Time.now, latency: latency }
       end
@@ -69,7 +70,6 @@ module Benchmarker
       sleep 2.0
       $latencies_coll.insert( { service: "pusher", time: Time.now, latency: average_latency } )
       Pusher.trigger('mongo', 'latencies-update', 'Mongo updated')
-      # puts @benchmarks.inspect
       @benchmarks = []
     end
 
@@ -90,8 +90,6 @@ module Benchmarker
       $reliabilities_coll.insert( { service: "pusher", time: Time.now, reliability: calculate_reliability_percentage } )
       Pusher.trigger('mongo', 'reliabilities-update', 'Mongo updated')
       @benchmarks = []
-      # puts @benchmarks.inspect
-      reset_client
     end
 
     def calculate_reliability_percentage
@@ -99,7 +97,28 @@ module Benchmarker
     end
 
     def benchmark_speed
-      puts @client
+      startup_times = []
+      (1..10).each do |num|
+        reset_client
+        end_time = 0
+        setup
+        start_time = Time.now
+        @client.bind('pusher_internal:subscription_succeeded') do |data|
+          end_time = Time.now
+          startup_times << (end_time - start_time) * 1000
+        end
+        connect
+        subscribe
+        sleep 1.5
+      end
+      $speeds_coll.insert( { service: "pusher", time: Time.now, speed: average_speed(startup_times) } )
+      startup_times = []
+      reset_client
+      Pusher.trigger('mongo', 'speeds-update', 'Mongo updated')
+    end
+
+    def average_speed startup_times
+      startup_times.inject(0, :+) / startup_times.length
     end
 
     def reset_client

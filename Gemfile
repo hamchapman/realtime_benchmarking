@@ -25,6 +25,7 @@ group :test do
   gem 'poltergeist'
   gem 'launchy'
   gem 'simplecov'
+  gem 'fuubar'
 end
 
 group :production do

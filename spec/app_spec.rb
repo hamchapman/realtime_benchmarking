@@ -71,8 +71,8 @@ describe 'Benchmark Analysis App' do
     end
   end
 
-  context 'Updating the graphs and reliabilities in realtime' do    
-    it 'the ruby latency graph updates', js: true do
+  context 'updates in realtime' do    
+    it 'the ruby latency graph', js: true do
       visit '/'
       expect(page.first("#chart_latency .nv-y .nv-axisMaxMin text").text).to eq "20"
       expect(page.all("#chart_latency .nv-y .nv-axisMaxMin text")[1].text).to eq "300"
@@ -83,7 +83,7 @@ describe 'Benchmark Analysis App' do
       expect(page.all("#chart_latency .nv-y .nv-axisMaxMin text")[1].text).to eq "400"
     end
 
-    it 'the javascript latency graph updates', js: true do
+    it 'the javascript latency graph', js: true do
       visit '/'
       expect(page.first("#chart_js_latency .nv-y .nv-axisMaxMin text").text).to eq "0"
       expect(page.all("#chart_js_latency .nv-y .nv-axisMaxMin text")[1].text).to eq "350"
@@ -94,7 +94,7 @@ describe 'Benchmark Analysis App' do
       expect(page.all("#chart_js_latency .nv-y .nv-axisMaxMin text")[1].text).to eq "400"
     end
 
-    it 'the javascript latency graph updates when a post request is made to /test', js: true do
+    it 'the javascript latency graph when a post request is made to /test', js: true do
       visit '/'
       expect(page.first("#chart_js_latency .nv-y .nv-axisMaxMin text").text).to eq "0"
       expect(page.all("#chart_js_latency .nv-y .nv-axisMaxMin text")[1].text).to eq "350"
@@ -105,7 +105,7 @@ describe 'Benchmark Analysis App' do
       expect(page.all("#chart_js_latency .nv-y .nv-axisMaxMin text")[1].text).to eq "400"
     end
 
-    it 'the reliability score updates', js: true do
+    it 'the reliability score', js: true do
       visit '/' 
       expect(page.find('.reliabilities .pusher-reliability-score').text).to eq "75%"
       $reliabilities_coll.insert( { service: "pusher", time: time + 39600, reliability: 90 } )
@@ -116,8 +116,8 @@ describe 'Benchmark Analysis App' do
 
   end
 
-  context 'Updating the graphs and reliabilities when a "show data sine" time is specified' do
-    it 'the ruby latency graph updates when a time is specified in the "view data since" input', js: true do
+  context 'when a "show data since" time is specified it updates ' do
+    it 'the ruby latency graph', js: true do
       visit '/'
       expect(page.first("#chart_latency .nv-y .nv-axisMaxMin text").text).to eq "20"
       expect(page.all("#chart_latency .nv-y .nv-axisMaxMin text")[1].text).to eq "300"
@@ -128,7 +128,7 @@ describe 'Benchmark Analysis App' do
       expect(page.all("#chart_latency .nv-y .nv-axisMaxMin text")[1].text).to eq "300"
     end
 
-    it 'the javascript latency graph updates when a time is specified in the "view data since" input', js: true do
+    it 'the javascript latency graph', js: true do
       visit '/'
       expect(page.first("#chart_js_latency .nv-y .nv-axisMaxMin text").text).to eq "0"
       expect(page.all("#chart_js_latency .nv-y .nv-axisMaxMin text")[1].text).to eq "350"
@@ -139,13 +139,30 @@ describe 'Benchmark Analysis App' do
       expect(page.all("#chart_js_latency .nv-y .nv-axisMaxMin text")[1].text).to eq "300"
     end
 
-    it 'the reliability score updates', js: true do
+    it 'the reliability score', js: true do
       visit '/' 
       expect(page.find('.reliabilities .pusher-reliability-score').text).to eq "75%"
       fill_in 'time', with: 'yesterday 10:30am'
       click_button 'Update'
       sleep 0.5
       expect(page.find('.reliabilities .pusher-reliability-score').text).to eq "50%"
+    end
+  end
+
+  context 'post requests to get new data receive JSON data' do
+    it 'for new_latency_data' do
+      post '/new_latency_data'
+      expect(last_response.header['Content-Type']).to eq 'application/json;charset=utf-8'
+    end
+
+    it 'for new_js_latency_data' do
+      post '/new_js_latency_data'
+      expect(last_response.header['Content-Type']).to eq 'application/json;charset=utf-8'
+    end
+
+    it 'for new_reliability_data' do
+      post '/new_reliability_data'
+      expect(last_response.header['Content-Type']).to eq 'application/json;charset=utf-8'
     end
   end
 

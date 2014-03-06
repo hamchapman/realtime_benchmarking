@@ -49,7 +49,6 @@ module Benchmarker
         sent = (Time.parse(message["time"])).to_f
         received = Time.now.to_f
         latency = (received - sent) * 1000
-        # puts latency
         puts message.inspect
         @benchmarks << { service: "realtime_co", time: Time.now, latency: latency }
       end
@@ -70,7 +69,6 @@ module Benchmarker
       sleep 2.0
       $latencies_coll.insert( { service: "realtime_co", time: Time.now, latency: average_latency } )
       Pusher.trigger('mongo', 'latencies-update', 'Mongo updated')
-      puts @benchmarks.inspect
       @benchmarks = []
     end
 
@@ -89,9 +87,7 @@ module Benchmarker
       sleep 2.0
       $reliabilities_coll.insert( { service: "realtime_co", time: Time.now, reliability: calculate_reliability_percentage } )
       Pusher.trigger('mongo', 'reliabilities-update', 'Mongo updated')
-      puts @benchmarks.inspect
       @benchmarks = []
-      reset_client
     end
 
     def calculate_reliability_percentage
@@ -99,7 +95,30 @@ module Benchmarker
     end
 
     def benchmark_speed
-      puts @client
+      startup_times = []
+      (1..10).each do |num|
+        reset_client
+        end_time = 0
+        setup
+        start_time = Time.now
+        @client.on_subscribed do |sender, channel|
+          end_time = Time.now
+          startup_times << (end_time - start_time) * 1000
+        end
+        @client.on_connected  do |sender|
+          subscribe
+        end
+        connect
+        sleep 1.5
+      end
+      $speeds_coll.insert( { service: "realtime_co", time: Time.now, speed: average_speed(startup_times) } )
+      startup_times = []
+      reset_client
+      Pusher.trigger('mongo', 'speeds-update', 'Mongo updated')
+    end
+
+    def average_speed startup_times
+      startup_times.inject(0, :+) / startup_times.length
     end
 
     def reset_client

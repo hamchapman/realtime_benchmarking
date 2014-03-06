@@ -17,6 +17,17 @@ module ApplicationHelper
     { service: service, reliability: reliability, color: colour }.to_json
   end
 
+  def speed_data_for service, colour, data
+    service_data = data.select { |entry| entry['service'] == service }
+    service_data.each do |hash|
+      hash[:x] = hash.delete "time"
+      hash[:y] = hash.delete "speed"
+      hash.delete "_id"
+      hash.delete "service"
+    end
+    { values: service_data, key: service, color: colour }.to_json
+  end
+
   def seperated_realiability_data reliability_data
     pusher_reliability = reliability_data_for 'pusher', $pusher_colour, reliability_data
     pubnub_reliability = reliability_data_for 'pubnub', $pubnub_colour, reliability_data
@@ -38,6 +49,12 @@ module ApplicationHelper
     firebase_js_latency = latency_data_for 'firebase', $firebase_colour, latency_data
     goinstant_js_latency = latency_data_for 'goinstant', $goinstant_colour, latency_data
     [pusher_js_latency, pubnub_js_latency, realtime_co_js_latency, firebase_js_latency, goinstant_js_latency]
+  end
+
+  def seperated_speed_data speed_data
+    pusher_speed = speed_data_for 'pusher', $pusher_colour, speed_data
+    realtime_co_speed = speed_data_for 'realtime_co', $realtime_co_colour, speed_data
+    [pusher_speed, realtime_co_speed]
   end
 
   def save_latencies_to_db latencies

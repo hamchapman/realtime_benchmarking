@@ -47,7 +47,7 @@ class BenchmarkAnalysis < Sinatra::Base
         runner.run_benchmarks
       end
     else
-      scheduler.every('1m') do
+      scheduler.every('2m') do
         puts "Running tests"
         runner = ServicesRunner.new "local_tester"
         runner.run_benchmarks
@@ -72,23 +72,6 @@ class BenchmarkAnalysis < Sinatra::Base
   end
 
   get '/' do 
-    latency_data = last_week_data 'latencies'
-    @pusher_latency = latency_data_for 'pusher', $pusher_colour, latency_data
-    @pubnub_latency = latency_data_for 'pubnub', $pubnub_colour, latency_data
-    @realtime_co_latency = latency_data_for 'realtime_co', $realtime_co_colour, latency_data
-
-    reliability_data = last_week_data 'reliabilities'
-    @pusher_reliability = reliability_data_for 'pusher', $pusher_colour, reliability_data
-    @pubnub_reliability = reliability_data_for 'pubnub', $pubnub_colour, reliability_data
-    @realtime_co_reliability = reliability_data_for 'realtime_co', $realtime_co_colour, reliability_data
-
-    js_latency_data = last_week_data 'js_latencies'
-    @pusher_js_latency = latency_data_for 'pusher', $pusher_colour, js_latency_data
-    @pubnub_js_latency = latency_data_for 'pubnub', $pubnub_colour, js_latency_data
-    @realtime_co_js_latency = latency_data_for 'realtimeco', $realtime_co_colour, js_latency_data
-    @goinstant_js_latency = latency_data_for 'goinstant', $goinstant_colour, js_latency_data
-    @firebase_js_latency = latency_data_for 'firebase', $firebase_colour, js_latency_data
-
     haml :index
   end
 
@@ -113,16 +96,12 @@ class BenchmarkAnalysis < Sinatra::Base
     combined_data = separated_js_latency_data(js_latency_data).to_json
   end
 
-  # post '/new_speed_data' do
-  #   content_type :json
-  #   since_time = Chronic.parse(params["since"])
-  #   if since_time
-  #     speed_data = settings.mongo_db['realtime_benchmarks']['speeds'].find({ time: { "$gt" => since_time } }, sort: ["time", 1]).to_a
-  #   else
-  #     speed_data = settings.mongo_db['realtime_benchmarks']['speeds'].find({ time: { "$gt" => Time.now - 7*24*60*60 } }, sort: ["time", 1]).to_a
-  #   end
-  #   combined_data = seperated_speed_data(speed_data).to_json
-  # end
+  post '/new_speed_data' do
+    content_type :json
+    since_time = Chronic.parse(params["since"])
+    since_time ? speed_data = time_specific_data('speeds', since_time) : speed_data = last_week_data('speeds')
+    combined_data = seperated_speed_data(speed_data).to_json
+  end
 
   get '/js_latencies' do
     haml :js_latencies

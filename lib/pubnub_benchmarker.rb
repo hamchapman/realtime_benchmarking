@@ -45,7 +45,6 @@ module Benchmarker
             sent = (Time.parse(data.message["time"])).to_f
             received = Time.now.to_f
             latency = (received - sent) * 1000
-            # puts latency
             puts data.message.inspect
             @benchmarks << { service: "pubnub", time: Time.now, latency: latency }
          }
@@ -67,7 +66,6 @@ module Benchmarker
       sleep 2
       $latencies_coll.insert( { service: "pubnub", time: Time.now, latency: average_latency } )
       Pusher.trigger('mongo', 'latencies-update', 'Mongo updated')
-      puts @benchmarks.inspect
       @benchmarks = []
     end
 
@@ -86,17 +84,12 @@ module Benchmarker
       sleep 2
       $reliabilities_coll.insert( { service: "pubnub", time: Time.now, reliability: calculate_reliability_percentage } )
       Pusher.trigger('mongo', 'reliabilities-update', 'Mongo updated')
-      puts @benchmarks.inspect
       @benchmarks = []
       reset_client
     end
 
     def calculate_reliability_percentage
       (@benchmarks.length / 20.0) * 100
-    end
-
-    def benchmark_speed
-      puts @client
     end
 
     def reset_client

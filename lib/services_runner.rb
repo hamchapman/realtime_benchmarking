@@ -34,13 +34,18 @@ class ServicesRunner
   end
 
   def benchmark_speeds
-    @services.each { |service| service.benchamark_speed } 
+    @services -= [@pubnub]
+    @services.each do |service| 
+      service.benchmark_speed
+      sleep 2
+    end
+    sleep 3
   end
 
   def run_benchmarks
     benchmark_latencies 
     benchmark_reliabilities
-    # benchmark_speeds
+    benchmark_speeds
     reset_benchmarkers 
   end
 

@@ -60,6 +60,11 @@ textarea, input {
   padding-left: 20px; 
 }
 
+.ruby-library-speed-sidebar {
+  padding-left: 20px;
+  margin-top: 460px;
+}
+
 .timeframe {
   font-size: 1.3em;
   margin-left: auto;
@@ -133,5 +138,9 @@ input[type=submit] {
 }
 
 #chart_js_latency svg {
+  height: 500px;
+}
+
+#chart_speed svg {
   height: 500px;
 }

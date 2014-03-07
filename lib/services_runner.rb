@@ -10,38 +10,26 @@ class ServicesRunner
   end
 
   def initialize_services channel
-    puts "****STARTING INITIALIZING SERVICES****"
-    puts Thread.list
     @pusher = Benchmarker::PusherBenchmarker.new channel
     @pubnub = Benchmarker::PubnubBenchmarker.new channel
     sleep 2
     @realtime_co = Benchmarker::RealtimeCoBenchmarker.new channel
     @services += [@pusher, @pubnub, @realtime_co]
-    puts "****FINISHING INITIALIZING SERVICES****"
-    puts Thread.list
   end
 
   def benchmark_latencies 
-    puts "****STARTING LATENCY BENCHMARKS****"
-    puts Thread.list
     @services.each do |service| 
       service.benchmark_latency
       sleep 2
     end
-    puts "****FINISHING LATENCY BENCHMARKS****"
-    puts Thread.list
     sleep 3
   end
 
   def benchmark_reliabilities
-    puts "****STARTING RELIABILITY BENCHMARKS****"
-    puts Thread.list
     @services.each do |service| 
       service.benchmark_reliability
       sleep 2
     end
-    puts "****FINISHING RELIABILITY BENCHMARKS****"
-    puts Thread.list
     sleep 3
   end
 
@@ -53,6 +41,12 @@ class ServicesRunner
     end
     sleep 3
   end
+
+  # Can't benchmark the speeds at the moment because there's a
+  # problem with threads being created and then not terminated
+  # if the client fails to connect then it can't be disconnected
+  # leaving it in a position where it isn't connected but still
+  # is taking up a thread and can't be disconnected
 
   def run_benchmarks
     benchmark_latencies 

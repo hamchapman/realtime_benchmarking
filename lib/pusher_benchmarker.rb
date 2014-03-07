@@ -8,8 +8,6 @@ module Benchmarker
     attr_reader :ready
 
     def initialize channel
-      puts "****PUSHER initialize"
-      puts Thread.list
       @channel = channel
       setup
       @benchmarks = []
@@ -24,13 +22,10 @@ module Benchmarker
       end
 
       connect
-      puts "****PUSHER END initialize"
-      puts Thread.list
     end
 
     def setup
       @client = PusherClient::Socket.new(Pusher.key)
-      puts @client.methods
     end
 
     def connect
@@ -101,8 +96,7 @@ module Benchmarker
     end
 
     def benchmark_speed
-      puts "PUSHER SPEEDS BEFORE"
-      puts Thread.list
+      setup
       startup_times = []
       (1..10).each do |num|
         reset_client
@@ -121,8 +115,6 @@ module Benchmarker
       startup_times = []
       reset_client
       Pusher.trigger('mongo', 'speeds-update', 'Mongo updated')
-      puts "PUSHER SPEEDS AFTER"
-      puts Thread.list
     end
 
     def average_speed startup_times

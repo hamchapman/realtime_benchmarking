@@ -6,15 +6,11 @@ module Benchmarker
     attr_reader :ready
 
     def initialize channel
-      puts "****PUBNUB initialize"
-      puts Thread.list
       @channel = channel
       @ready = false
       @benchmarks = []
       connect
       subscribe
-      puts "****PUBNUB END initialize"
-      puts Thread.list
     end
 
     def connect

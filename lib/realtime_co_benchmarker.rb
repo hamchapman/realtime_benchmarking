@@ -6,8 +6,6 @@ module Benchmarker
     attr_reader :ready
 
     def initialize channel
-      puts "****REALTIME initialize"
-      puts Thread.list
       @channel = channel
       setup
       @benchmarks = []
@@ -26,8 +24,6 @@ module Benchmarker
       end
 
       connect
-      puts "****REALTIME END initialize"
-      puts Thread.list
     end
 
     def setup
@@ -100,8 +96,7 @@ module Benchmarker
     end
 
     def benchmark_speed
-      puts "RTC"
-      puts Thread.list
+      setup
       startup_times = []
       (1..10).each do |num|
         reset_client
@@ -122,8 +117,6 @@ module Benchmarker
       startup_times = []
       reset_client
       Pusher.trigger('mongo', 'speeds-update', 'Mongo updated')
-      puts "RTC AFTER"
-      puts Thread.list
     end
 
     def average_speed startup_times

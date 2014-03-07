@@ -6,11 +6,15 @@ module Benchmarker
     attr_reader :ready
 
     def initialize channel
+      puts "****PUBNUB initialize"
+      puts Thread.list
       @channel = channel
       @ready = false
       @benchmarks = []
       connect
       subscribe
+      puts "****PUBNUB END initialize"
+      puts Thread.list
     end
 
     def connect
@@ -27,7 +31,7 @@ module Benchmarker
     end
 
     def disconnect
-
+      @client.close_connection
     end
 
     def send message
@@ -94,7 +98,7 @@ module Benchmarker
 
     def reset_client
       unsubscribe
-      # disconnect
+      disconnect
       @client = nil
     end
 

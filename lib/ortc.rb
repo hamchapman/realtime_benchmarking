@@ -299,7 +299,7 @@ module ORTC
 			@socket = nil
 			@got_heartbeat = false
 			EM.error_handler{ |e| 
-				raise "Error during event loop: #{e.message}"
+				puts "Error during event loop: #{e.message}"
 				EM.stop_event_loop				
 			}		
 			Thread.abort_on_exception=true
@@ -606,7 +606,7 @@ module ORTC
 							@heartbeat_thread.kill if @heartbeat_thread 
 						end
 						@is_connected = false
-						EM.stop_event_loop
+						# EM.stop_event_loop  
 					end
 				}
 			}
@@ -629,7 +629,8 @@ module ORTC
 			@is_reconnecting = false
 			@is_disconnecting = true
 			@channels.clear
-			@socket.close(nil, nil ,nil)			
+      #@socket.close(nil, nil ,nil)
+      @socket.close()
 			@client_thread.kill if @client_thread
 		end
 		

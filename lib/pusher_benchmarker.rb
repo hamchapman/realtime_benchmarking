@@ -8,6 +8,8 @@ module Benchmarker
     attr_reader :ready
 
     def initialize channel
+      puts "****PUSHER initialize"
+      puts Thread.list
       @channel = channel
       setup
       @benchmarks = []
@@ -18,16 +20,17 @@ module Benchmarker
       end
 
       @client.bind('pusher_internal:subscription_succeeded') do |data|
-        puts "I'm subscribed"
-        puts Time.now
         @ready = true  
       end
 
       connect
+      puts "****PUSHER END initialize"
+      puts Thread.list
     end
 
     def setup
       @client = PusherClient::Socket.new(Pusher.key)
+      puts @client.methods
     end
 
     def connect
@@ -90,6 +93,7 @@ module Benchmarker
       $reliabilities_coll.insert( { service: "pusher", time: Time.now, reliability: calculate_reliability_percentage } )
       Pusher.trigger('mongo', 'reliabilities-update', 'Mongo updated')
       @benchmarks = []
+      reset_client
     end
 
     def calculate_reliability_percentage
@@ -97,6 +101,8 @@ module Benchmarker
     end
 
     def benchmark_speed
+      puts "PUSHER SPEEDS BEFORE"
+      puts Thread.list
       startup_times = []
       (1..10).each do |num|
         reset_client
@@ -115,6 +121,8 @@ module Benchmarker
       startup_times = []
       reset_client
       Pusher.trigger('mongo', 'speeds-update', 'Mongo updated')
+      puts "PUSHER SPEEDS AFTER"
+      puts Thread.list
     end
 
     def average_speed startup_times

@@ -38,7 +38,7 @@ class BenchmarkAnalysis < Sinatra::Base
   end
     
   configure do
-    scheduler = Rufus::Scheduler.new
+    scheduler = Rufus::Scheduler.new(:max_work_threads => 10)
     set :scheduler, scheduler
     if ENV['MONGOHQ_URL']
       scheduler.every('5m') do
@@ -48,11 +48,31 @@ class BenchmarkAnalysis < Sinatra::Base
         runner = nil
       end
     else
-      scheduler.every('2m') do
+      job = scheduler.schedule_every('2m', :first => "0.4s") do
         puts "Running tests"
+        puts "Number of threads for job is #{job.threads}"
+        puts "Number of threads total is #{Thread.list.count}"
+        puts "Threads are:"
+        puts Thread.list
+        Thread.list.each do |thread|
+          puts thread.status
+        end
         runner = ServicesRunner.new "local_tester"
         runner.run_benchmarks
         runner = nil
+        puts "Number of threads for job is #{job.threads}"
+        puts "Number of threads total is #{Thread.list.count}"
+        puts "Threads are:"
+        puts Thread.list
+        Thread.list.each do |thread|
+          puts thread.status
+        end
+        puts "Hitting this point"
+        # Thread.list[2..-1].each do |thread|
+        #   thread.terminate if thread.status == "sleep"
+        # end
+        # puts "SLeeping threads terminated"
+        # puts "Threads are:"
       end
     end
   end

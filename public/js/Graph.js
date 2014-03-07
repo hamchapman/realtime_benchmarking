@@ -30,10 +30,10 @@ $(document).ready(function() {
     loadJSLatencyGraph(current_timeframe);
   });
 
-  mongoUpdateChannel.bind( 'speeds-update', function( message ) {
-    var current_timeframe = $(".current-timeframe").attr("data-timeframe");
-    loadRubySpeedGraph(current_timeframe);
-  });
+  // mongoUpdateChannel.bind( 'speeds-update', function( message ) {
+  //   var current_timeframe = $(".current-timeframe").attr("data-timeframe");
+  //   loadRubySpeedGraph(current_timeframe);
+  // });
   
   function updateRubyLatencyGraph (response) {
     var updatedData = response;
@@ -165,8 +165,8 @@ $(document).ready(function() {
   function loadPageData (current_timeframe) {
     loadRubyLatencyGraph(current_timeframe);
     loadJSLatencyGraph(current_timeframe);
-    loadRubySpeedGraph(current_timeframe);
     loadRubyReliabilities(current_timeframe);
+    // loadRubySpeedGraph(current_timeframe);
   };
 
   function loadRubyLatencyGraph (current_timeframe) {

@@ -48,7 +48,7 @@ class BenchmarkAnalysis < Sinatra::Base
         runner = nil
       end
     else
-      job = scheduler.schedule_every('2m', :first => "0.4s") do
+      job = scheduler.schedule_every('5m', :first => "0.4s") do
         runner = ServicesRunner.new "local_tester"
         runner.run_benchmarks
         runner = nil

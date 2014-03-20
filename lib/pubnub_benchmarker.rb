@@ -18,7 +18,6 @@ module Benchmarker
           :subscribe_key    => 'sub-c-170fcba8-9973-11e3-8d39-02ee2ddab7fe',
           :publish_key      => 'pub-c-28b03a80-5f93-4d3c-a431-e08e20e7e446',
           :error_callback   => lambda { |msg|
-            puts "SOMETHING TERRIBLE HAPPENED HERE: #{msg.inspect}"
           }, 
           :connect_callback => lambda { |msg|
             @ready = true
@@ -45,7 +44,6 @@ module Benchmarker
             sent = (Time.parse(data.message["time"])).to_f
             received = Time.now.to_f
             latency = (received - sent) * 1000
-            puts data.message.inspect
             @benchmarks << { service: "pubnub", time: Time.now, latency: latency }
          }
       )

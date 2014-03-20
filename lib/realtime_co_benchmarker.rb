@@ -49,7 +49,6 @@ module Benchmarker
         sent = (Time.parse(message["time"])).to_f
         received = Time.now.to_f
         latency = (received - sent) * 1000
-        puts message.inspect
         @benchmarks << { service: "realtime_co", time: Time.now, latency: latency }
       end
     end

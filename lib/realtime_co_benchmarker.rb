@@ -32,7 +32,7 @@ module Benchmarker
     end
 
     def connect
-      @client.connect 'BNrppn'
+      @client.connect '5fgsck'
     end
 
     def disconnect
@@ -45,8 +45,8 @@ module Benchmarker
 
     def subscribe
       @client.subscribe(@channel, true) do |sender, channel, message| 
-        message = JSON.parse(message)
-        sent = (Time.parse(message["time"])).to_f
+        parsed_message = JSON.parse(message)
+        sent = (Time.parse(parsed_message["time"])).to_f
         received = Time.now.to_f
         latency = (received - sent) * 1000
         @benchmarks << { service: "realtime_co", time: Time.now, latency: latency }

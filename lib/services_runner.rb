@@ -33,14 +33,14 @@ class ServicesRunner
     sleep 3
   end
 
-  def benchmark_speeds
-    @services -= [@pubnub]
-    @services.each do |service| 
-      service.benchmark_speed
-      sleep 2
-    end
-    sleep 3
-  end
+  # def benchmark_speeds
+  #   @services -= [@pubnub]
+  #   @services.each do |service| 
+  #     service.benchmark_speed
+  #     sleep 2
+  #   end
+  #   sleep 3
+  # end
 
   # Can't benchmark the speeds at the moment because there's a
   # problem with threads being created and then not terminated

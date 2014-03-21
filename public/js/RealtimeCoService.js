@@ -48,7 +48,7 @@ RealtimeCoService.prototype._init = function( ortcFactory ) {
     self._log('Error: ' + msg);   
   };
 
-  var appKey = 'BNrppn'; 
+  var appKey = '5fgsck'; 
   var authenticationToken = 'NOT_USED_BECAUSE_AUTH_IS_SET_OFF_IN_THE_DASHBOARD';
   this._client.connect(appKey, authenticationToken);
 };

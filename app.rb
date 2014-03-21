@@ -41,11 +41,11 @@ class BenchmarkAnalysis < Sinatra::Base
     scheduler = Rufus::Scheduler.new(:max_work_threads => 10)
     set :scheduler, scheduler
     if ENV['MONGOHQ_URL']
-      job = scheduler.schedule_every('5m', :first => "0.4s") do
-        runner = ServicesRunner.new "heroku_tester"
-        runner.run_benchmarks
-        runner = nil
-      end
+      # job = scheduler.schedule_every('5m', :first => "0.4s") do
+      #   runner = ServicesRunner.new "heroku_tester"
+      #   runner.run_benchmarks
+      #   runner = nil
+      # end
     else
       job = scheduler.schedule_every('5m', :first => "0.4s") do
         runner = ServicesRunner.new "local_tester"

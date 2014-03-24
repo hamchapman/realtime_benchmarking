@@ -136,14 +136,14 @@ input[type=submit] {
   color: #ad007b;
 }
 
-#chart_latency svg {
-  height: 500px;
+#chart_latency, #chart_js_latency {
+  color: black;
 }
 
-#chart_js_latency svg {
-  height: 500px;
+#chart_latency svg, #chart_js_latency svg {
+  height: 400px;
 }
 
 #chart_speed svg {
-  height: 500px;
+  height: 400px;
 }

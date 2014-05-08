@@ -63,7 +63,7 @@ module Benchmarker
       end
       sleep 2
       latency = average_latency
-      if reliability > 2000
+      if latency > 2000
         $latencies_coll.insert( { service: "realtime_co", time: Time.now, latency: 2000 } )
       else
         $latencies_coll.insert( { service: "realtime_co", time: Time.now, latency: latency } )

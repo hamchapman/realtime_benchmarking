@@ -103,6 +103,13 @@ class BenchmarkAnalysis < Sinatra::Base
     combined_data = seperated_speed_data(speed_data).to_json
   end
 
+  get '/reliability' do
+    content_type :json
+    since_time = Chronic.parse(params["since"])
+    since_time ? reliability_data = time_specific_data('reliabilities', since_time) : reliability_data = last_day_data('reliabilities')
+    combined_data = seperated_realiability_data(reliability_data).to_json
+  end
+
   get '/js_latencies' do
     haml :js_latencies
   end

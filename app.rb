@@ -36,7 +36,7 @@ class BenchmarkAnalysis < Sinatra::Base
     conn = MongoClient.new("localhost", 27017)
     set :mongo_db, conn.db('realtime_benchmarks')
   end
-    
+
   configure do
     scheduler = Rufus::Scheduler.new(:max_work_threads => 10)
     set :scheduler, scheduler
@@ -71,35 +71,35 @@ class BenchmarkAnalysis < Sinatra::Base
     $js_latencies_coll = mongo_db['realtime_benchmarks']['js_latencies']
   end
 
-  get '/' do 
+  get '/' do
     haml :index
   end
 
   post '/new_latency_data' do
     content_type :json
     since_time = Chronic.parse(params["since"])
-    since_time ? latency_data = time_specific_data('latencies', since_time) : latency_data = last_week_data('latencies')
+    since_time ? latency_data = time_specific_data('latencies', since_time) : latency_data = last_day_data('latencies')
     combined_data = separated_latency_data(latency_data).to_json
   end
 
   post '/new_reliability_data' do
     content_type :json
     since_time = Chronic.parse(params["since"])
-    since_time ? reliability_data = time_specific_data('reliabilities', since_time) : reliability_data = last_week_data('reliabilities')
+    since_time ? reliability_data = time_specific_data('reliabilities', since_time) : reliability_data = last_day_data('reliabilities')
     combined_data = seperated_realiability_data(reliability_data).to_json
   end
 
   post '/new_js_latency_data' do
     content_type :json
     since_time = Chronic.parse(params["since"])
-    since_time ? js_latency_data = time_specific_data('js_latencies', since_time) : js_latency_data = last_week_data('js_latencies')
+    since_time ? js_latency_data = time_specific_data('js_latencies', since_time) : js_latency_data = last_day_data('js_latencies')
     combined_data = separated_js_latency_data(js_latency_data).to_json
   end
 
   post '/new_speed_data' do
     content_type :json
     since_time = Chronic.parse(params["since"])
-    since_time ? speed_data = time_specific_data('speeds', since_time) : speed_data = last_week_data('speeds')
+    since_time ? speed_data = time_specific_data('speeds', since_time) : speed_data = last_day_data('speeds')
     combined_data = seperated_speed_data(speed_data).to_json
   end
 

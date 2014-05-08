@@ -10,7 +10,7 @@ module Benchmarker
       setup
       @benchmarks = []
       @ready = false
-      
+
       @client.on_connected  do |sender|
         subscribe
       end
@@ -44,7 +44,7 @@ module Benchmarker
     end
 
     def subscribe
-      @client.subscribe(@channel, true) do |sender, channel, message| 
+      @client.subscribe(@channel, true) do |sender, channel, message|
         parsed_message = JSON.parse(message)
         sent = (Time.parse(parsed_message["time"])).to_f
         received = Time.now.to_f
@@ -66,7 +66,12 @@ module Benchmarker
         sleep 0.2
       end
       sleep 2.0
-      $latencies_coll.insert( { service: "realtime_co", time: Time.now, latency: average_latency } )
+      latency = average_latency
+      if reliability > 2000
+        $latencies_coll.insert( { service: "realtime_co", time: Time.now, latency: 2000 } )
+      else
+        $latencies_coll.insert( { service: "realtime_co", time: Time.now, latency: latency } )
+      end
       Pusher.trigger('mongo', 'latencies-update', 'Mongo updated')
       @benchmarks = []
     end
@@ -84,8 +89,11 @@ module Benchmarker
         sleep 0.2
       end
       sleep 2.0
-      $reliabilities_coll.insert( { service: "realtime_co", time: Time.now, reliability: calculate_reliability_percentage } )
-      Pusher.trigger('mongo', 'reliabilities-update', 'Mongo updated')
+      reliability = calculate_reliability_percentage
+      if reliability <= 100
+        $reliabilities_coll.insert( { service: "realtime_co", time: Time.now, reliability: reliability } )
+        Pusher.trigger('mongo', 'reliabilities-update', 'Mongo updated')
+      end
       @benchmarks = []
       reset_client
     end

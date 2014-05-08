@@ -17,7 +17,7 @@ $(document).ready(function() {
 
   mongoUpdateChannel.bind( 'reliabilities-update', function( message ) {
     var current_timeframe = $(".current-timeframe").attr("data-timeframe");
-    loadRubyReliabilities(current_timeframe); 
+    loadRubyReliabilities(current_timeframe);
   });
 
   mongoUpdateChannel.bind( 'latencies-update', function( message ) {
@@ -34,7 +34,7 @@ $(document).ready(function() {
   //   var current_timeframe = $(".current-timeframe").attr("data-timeframe");
   //   loadRubySpeedGraph(current_timeframe);
   // });
-  
+
   function updateRubyLatencyGraph (response) {
     var updatedData = response;
     var serviceData = [];
@@ -42,26 +42,26 @@ $(document).ready(function() {
     updatedData.forEach(function(individualServiceData) {
       serviceData.push(JSON.parse(individualServiceData));
     });
-    
+
     nv.addGraph(function() {
       var chart = nv.models.lineChart()
         .x(function(d){return dateFormatIn.parse(d.x);})
-        .margin({left: 100, bottom: 100})  
-        .useInteractiveGuideline(true)  
-        .transitionDuration(350)  
-        .showLegend(true)       
-        .showYAxis(true)        
+        .margin({left: 100, bottom: 100})
+        .useInteractiveGuideline(true)
+        .transitionDuration(350)
+        .showLegend(true)
+        .showYAxis(true)
         .showXAxis(true);
-      
-      chart.xAxis 
+
+      chart.xAxis
         .rotateLabels(-45)
         .tickFormat(function(d) { return dateFormatOut(new Date(d)) });
-       
+
       chart.yAxis
         .axisLabel('Latency (ms)')
         .tickFormat(d3.format('.0f'));
 
-      d3.select('#chart_latency svg')    
+      d3.select('#chart_latency svg')
         .datum(serviceData)
         .call(chart);
 
@@ -98,27 +98,27 @@ $(document).ready(function() {
         }
       })
     });
-      
+
     nv.addGraph(function() {
       var chart = nv.models.lineChart()
         .x(function(d){return dateFormatIn.parse(d.x);})
-        .margin({left: 100, bottom: 100})  
-        .useInteractiveGuideline(true)  
-        .transitionDuration(350)  
-        .showLegend(true)       
-        .showYAxis(true)        
+        .margin({left: 100, bottom: 100})
+        .useInteractiveGuideline(true)
+        .transitionDuration(350)
+        .showLegend(true)
+        .showYAxis(true)
         .showXAxis(true)
         .forceY([0, serviceWideMaxY]);
-      
-      chart.xAxis 
+
+      chart.xAxis
         .rotateLabels(-45)
         .tickFormat(function(d) { return dateFormatOut(new Date(d)) });
-       
+
       chart.yAxis
         .axisLabel('Latency (ms)')
         .tickFormat(d3.format('.0f'));
 
-      d3.select('#chart_js_latency svg')    
+      d3.select('#chart_js_latency svg')
         .datum(serviceData)
         .call(chart);
 
@@ -134,26 +134,26 @@ $(document).ready(function() {
     updatedData.forEach(function(individualServiceData) {
       serviceData.push(JSON.parse(individualServiceData));
     });
-    
+
     nv.addGraph(function() {
       var chart = nv.models.lineChart()
         .x(function(d){return dateFormatIn.parse(d.x);})
-        .margin({left: 100, bottom: 100})  
-        .useInteractiveGuideline(true)  
-        .transitionDuration(350)  
-        .showLegend(true)       
-        .showYAxis(true)        
+        .margin({left: 100, bottom: 100})
+        .useInteractiveGuideline(true)
+        .transitionDuration(350)
+        .showLegend(true)
+        .showYAxis(true)
         .showXAxis(true);
-      
-      chart.xAxis 
+
+      chart.xAxis
         .rotateLabels(-45)
         .tickFormat(function(d) { return dateFormatOut(new Date(d)) });
-       
+
       chart.yAxis
         .axisLabel('Time (ms)')
         .tickFormat(d3.format('.0f'));
 
-      d3.select('#chart_speed svg')    
+      d3.select('#chart_speed svg')
         .datum(serviceData)
         .call(chart);
 
@@ -174,7 +174,7 @@ $(document).ready(function() {
       type: 'POST',
       url: '/new_latency_data',
       data: { since: current_timeframe },
-      success: function (response) { 
+      success: function (response) {
         updateRubyLatencyGraph(response);
       }
     });
@@ -185,7 +185,7 @@ $(document).ready(function() {
       type: 'POST',
       url: '/new_js_latency_data',
       data: { since: current_timeframe },
-      success: function (response) { 
+      success: function (response) {
         updateJSLatencyGraph(response);
       }
     });
@@ -196,7 +196,7 @@ $(document).ready(function() {
       type: 'POST',
       url: '/new_speed_data',
       data: { since: current_timeframe },
-      success: function (response) { 
+      success: function (response) {
         updateRubySpeedGraph(response);
       }
     });
@@ -207,7 +207,7 @@ $(document).ready(function() {
       type: 'POST',
       url: '/new_reliability_data',
       data: { since: current_timeframe },
-      success: function (response) { 
+      success: function (response) {
         updateReliabilities(response);
       }
     });

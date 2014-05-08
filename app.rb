@@ -86,7 +86,7 @@ class BenchmarkAnalysis < Sinatra::Base
     content_type :json
     since_time = Chronic.parse(params["since"])
     since_time ? reliability_data = time_specific_data('reliabilities', since_time) : reliability_data = last_day_data('reliabilities')
-    combined_data = seperated_realiability_data(reliability_data).to_json
+    combined_data = seperated_reliability_data(reliability_data).to_json
   end
 
   post '/new_js_latency_data' do
@@ -107,7 +107,18 @@ class BenchmarkAnalysis < Sinatra::Base
     content_type :json
     since_time = Chronic.parse(params["since"])
     since_time ? reliability_data = time_specific_data('reliabilities', since_time) : reliability_data = last_day_data('reliabilities')
-    combined_data = seperated_realiability_data(reliability_data).to_json
+    combined_data = seperated_reliability_data(reliability_data).to_json
+  end
+
+  get '/latency' do
+    content_type :json
+    since_time = Chronic.parse(params["since"])
+    if params["lang"] == "js" || params["lang"] == "javascript"
+      since_time ? latency_data = time_specific_data('js_latencies', since_time) : latency_data = last_day_data('js_latencies')
+    else
+      since_time ? latency_data = time_specific_data('latencies', since_time) : latency_data = last_day_data('latencies')
+    end
+    combined_data = seperated_latency_data(latency_data).to_json
   end
 
   get '/js_latencies' do

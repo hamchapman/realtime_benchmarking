@@ -28,7 +28,7 @@ module ApplicationHelper
     { values: service_data, key: service, color: colour }.to_json
   end
 
-  def seperated_realiability_data reliability_data
+  def seperated_reliability_data reliability_data
     pusher_reliability = reliability_data_for 'pusher', $pusher_colour, reliability_data
     pubnub_reliability = reliability_data_for 'pubnub', $pubnub_colour, reliability_data
     realtime_co_reliability = reliability_data_for 'realtime_co', $realtime_co_colour, reliability_data

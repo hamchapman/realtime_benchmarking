@@ -64,9 +64,9 @@ module Benchmarker
       sleep 2
       latency = average_latency
       if latency > 2000
-        $latencies_coll.insert( { service: "realtime_co", time: Time.now, latency: 2000 } )
+        $latencies_coll.insert( { service: "pubnub", time: Time.now, latency: 2000 } )
       else
-        $latencies_coll.insert( { service: "realtime_co", time: Time.now, latency: latency } )
+        $latencies_coll.insert( { service: "pubnub", time: Time.now, latency: latency } )
       end
       Pusher.trigger('mongo', 'latencies-update', 'Mongo updated')
       @benchmarks = []

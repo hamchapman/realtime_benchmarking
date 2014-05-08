@@ -126,7 +126,7 @@ class BenchmarkAnalysis < Sinatra::Base
       if num_values > 0
         latencies << {
           service: service['key'],
-          latency: service['values'].inject(0) { |memo, val| memo += val['y'] } / num_values
+          latency: service['values'].inject(0) { |memo, val| memo += val['y'].to_f;  } / num_values
         }
       else
         latencies << {

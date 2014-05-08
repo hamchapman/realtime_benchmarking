@@ -118,8 +118,24 @@ class BenchmarkAnalysis < Sinatra::Base
     else
       since_time ? latency_data = time_specific_data('latencies', since_time) : latency_data = last_day_data('latencies')
     end
-    combined_data = separated_latency_data(latency_data).to_json
-    latency_data.to_json
+    combined_data = separated_latency_data(latency_data)
+    latencies = []
+    combined_data.each do |service|
+      service = JSON.parse(service)
+      num_values = service['values'].length
+      if num_values > 0
+        latencies << {
+          service: service['key'],
+          latency: service['values'].inject(0) { |memo, val| memo += val['y'] } / num_values
+        }
+      else
+        latencies << {
+          service: service['key'],
+          latency: -1
+        }
+      end
+    end
+    latencies.to_json
   end
 
   get '/js_latencies' do

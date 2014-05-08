@@ -113,12 +113,15 @@ class BenchmarkAnalysis < Sinatra::Base
   get '/latency' do
     content_type :json
     since_time = Chronic.parse(params["since"])
+    combined_data = nil
     if params["lang"] == "js" || params["lang"] == "javascript"
       since_time ? latency_data = time_specific_data('js_latencies', since_time) : latency_data = last_day_data('js_latencies')
+      combined_data = separated_js_latency_data(latency_data)
     else
       since_time ? latency_data = time_specific_data('latencies', since_time) : latency_data = last_day_data('latencies')
+      combined_data = separated_latency_data(latency_data)
     end
-    combined_data = separated_latency_data(latency_data)
+
     latencies = []
     combined_data.each do |service|
       service = JSON.parse(service)

@@ -119,6 +119,7 @@ class BenchmarkAnalysis < Sinatra::Base
       since_time ? latency_data = time_specific_data('latencies', since_time) : latency_data = last_day_data('latencies')
     end
     combined_data = separated_latency_data(latency_data).to_json
+    latency_data.to_json
   end
 
   get '/js_latencies' do
